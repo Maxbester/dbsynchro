@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<source>
+		<name>MS Server</name>
+		<url>\\192.168.0.30</url>
+		<login>admin</login>
+		<password>test</password>
+		<driver>http://msdn.microsoft.com/en-us/sqlserver/aa937724</driver>
+	</source>
+	<target>
+		<name>Linux Web Server</name>
+		<url>www.speedcrete.co.uk</url>
+		<login>www</login>
+		<password>test</password>
+		<driver>com.mysql.jdbc.Driver</driver>
+	</target>
+</config>
