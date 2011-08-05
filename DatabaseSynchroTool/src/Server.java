@@ -4,8 +4,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Defines the information about a database server and method to modify its content. 
@@ -21,6 +19,7 @@ public class Server {
 	private String password;
 	private String driver;
 	private Connection connection;
+	private ResultSet rs;
 	
 	
 	public Server(String name, String url, String login, String password, String driver) {
@@ -31,11 +30,13 @@ public class Server {
 		this.driver = driver;
 	}
 
-    protected Connection getConnect() throws ClassNotFoundException, SQLException {
+    protected Connection connect() throws ClassNotFoundException, SQLException {
     	if (connection == null) {
-	        System.out.println("Connection to: "+this.login+"@"+this.url);
+	        System.out.println("Connection to: "+this.url);
+	        System.out.println("Trying to connect...");
 	        Class.forName(driver);
 	        connection = DriverManager.getConnection("jdbc:mysql:"+url, login, password);
+	        System.out.println("Connection established.");
     	}
         return connection;
     }
@@ -51,7 +52,7 @@ public class Server {
     public int simpleStatement (String statement) throws SQLException, ClassNotFoundException {
     	if (statement == null)
     		return 0;
-        PreparedStatement insert = getConnect().prepareStatement(statement);
+        PreparedStatement insert = connect().prepareStatement(statement);
         int res = insert.executeUpdate();
         insert.close();
         return res;
@@ -64,15 +65,10 @@ public class Server {
      * @throws SQLException 
      * @throws ClassNotFoundException 
      */
-    public List<ResultSet> selectStatement (String statement) throws ClassNotFoundException, SQLException {
-        List<ResultSet> res = new ArrayList<ResultSet>();
-        Statement stat = getConnect().createStatement();
-        ResultSet rs = stat.executeQuery(statement);
-        while (rs.next()) {
-            res.add(rs);
-        }
-        rs.close();
-        return res;
+    public ResultSet selectStatement (String statement) throws ClassNotFoundException, SQLException {
+        Statement stat = connect().createStatement();
+        rs = stat.executeQuery(statement);
+        return rs;
     }
 
 	public String getName() {
@@ -132,7 +128,10 @@ public class Server {
 	}
 
 	
-	public void closeConnection() throws SQLException, ClassNotFoundException {
-		getConnect().close();
+	public void disconnect() throws SQLException, ClassNotFoundException {
+		if (rs != null) {
+			rs.close();
+		}
+		connect().close();
 	}
 }

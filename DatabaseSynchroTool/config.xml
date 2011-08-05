@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+http://www.khelll.com/blog/mysql/changing-database-encoding-from-latin-to-utf8/
+
+-->
 <config>
 	<server type="source">
 		<name>MS Server</name>
@@ -9,9 +14,11 @@
 	</server>
 	<server type="target">
 		<name>Linux Web Server</name>
-		<url>www.speedcrete.co.uk</url>
-		<login>www</login>
-		<password>test</password>
+<!-- To test the connection and rights you can run: mysql -u root -h webserver.speedcrete.co.uk -p		-->
+<!--		<url>//webserver.speedcrete.co.uk/speedcrete</url>-->
+		<url>//localhost/speedcrete</url>
+		<login>root</login>
+		<password>redcar</password>
 		<driver>com.mysql.jdbc.Driver</driver>
 	</server>
 </config>
