@@ -1,7 +1,8 @@
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List; 
+import java.nio.charset.MalformedInputException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -16,26 +17,88 @@ public class ConfReader {
 	
 	private static final File xml = new File("config.xml");
 	
-	private Server source;
-	private Server target;
+	private Server sourceServer;
+	private Server targetServer;
 	
-	public ConfReader () throws ParserConfigurationException, SAXException, IOException {
+	public ConfReader () throws ParserConfigurationException, IOException, SAXException {
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder constructor = factory.newDocumentBuilder();
 		Document document = constructor.parse(xml);
 		
-		List<Element> source = new ArrayList<Element>();
-		
 		Element root = document.getDocumentElement();
 		
-		NodeList list = root.getElementsByTagName("source");
+		NodeList nodes = root.getElementsByTagName("server");
+		Map<String, Element> servers = new HashMap<String, Element>();
 		
-		for(int i=0 ; i < list.getLength() ; i++) {
-			Element e = (Element)list.item(i);
-			if(e.hasAttribute("href"))
-				source.add(e);
+		if (nodes.getLength() != 2) {
+			System.out.println("ERROR: Two servers must be specified in the configuration file: config.xml. One for the source and one for the target.");
 		}
 
+		
+		for (int i = 0 ; i < nodes.getLength() ; i++) {
+			servers.put(((Element) nodes.item(i)).getAttribute("type"), (Element) nodes.item(i));
+		}
+		
+		Element source = servers.get("source");
+		Element target = servers.get("target");
+		
+		if (source == null) {
+			System.out.println("ERROR: The source has not been specified in the configuration file: config.xml");
+			throw new MalformedInputException(0);
+		}
+		
+		if (target == null) {
+			System.out.println("ERROR: The target has not been specified in the configuration file: config.xml");
+			throw new MalformedInputException(0);
+		}
+		
+		Element name;
+		Element url;
+		Element login;
+		Element password;
+		Element driver;
+		
+		if (source.getElementsByTagName("name").getLength() != 1 || source.getElementsByTagName("url").getLength() != 1 ||
+				source.getElementsByTagName("login").getLength() != 1 || source.getElementsByTagName("password").getLength() != 1 ||
+				source.getElementsByTagName("driver").getLength() != 1) {
+			System.out.println("ERROR: Have a look at the source in the configuration file: config.xml");
+			throw new MalformedInputException(1);
+		}
+		
+		name = (Element) source.getElementsByTagName("name").item(0);
+		url = (Element) source.getElementsByTagName("url").item(0);
+		login = (Element) source.getElementsByTagName("login").item(0);
+		password = (Element) source.getElementsByTagName("password").item(0);
+		driver = (Element) source.getElementsByTagName("driver").item(0);
+		
+		sourceServer = new Server(name.getTextContent(), url.getTextContent(), login.getTextContent(), password.getTextContent(), driver.getTextContent());
+		
+		if (target.getElementsByTagName("name").getLength() != 1 || target.getElementsByTagName("url").getLength() != 1 ||
+				target.getElementsByTagName("login").getLength() != 1 || target.getElementsByTagName("password").getLength() != 1 ||
+				target.getElementsByTagName("driver").getLength() != 1) {
+			System.out.println("ERROR: Have a look at the target in the configuration file: config.xml");
+			throw new MalformedInputException(1);
+		}
+		
+		name = (Element) target.getElementsByTagName("name").item(0);
+		url = (Element) target.getElementsByTagName("url").item(0);
+		login = (Element) target.getElementsByTagName("login").item(0);
+		password = (Element) target.getElementsByTagName("password").item(0);
+		driver = (Element) target.getElementsByTagName("driver").item(0);
+		
+		targetServer = new Server(name.getTextContent(), url.getTextContent(), login.getTextContent(), password.getTextContent(), driver.getTextContent());
+		
+		System.out.println("Config file reading OK");
 	}
 
+	
+	public Server getSourceServer() {
+		return sourceServer;
+	}
+
+	public Server getTargetServer() {
+		return targetServer;
+	}
+
+	
 }
