@@ -1,1 +1,3 @@
-SELECT * FROM items i WHERE i.id=[products.id] join attributes a on a.id=[base.id] LIMIT 1;
+SELECT * FROM items i WHERE i.id=[SELECT p.id FROM products p where p.stockleve=3] LIMIT 1,100;
+
+UPDATE items SET  stocklevel=[products.stocklevel] WHERE stockcode=[products.stockcode];

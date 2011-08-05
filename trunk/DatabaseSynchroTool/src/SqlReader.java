@@ -16,25 +16,34 @@ import java.util.regex.Pattern;
  */
 public class SqlReader {
 	
-	private static final File sqlFile = new File("statements.sql");
+	private final File sqlFile;
 	private List<String> statements;
 	private Map<Integer, String> sourceStatements;
-	private Map<Integer, String> targetStatements;
+	private List<String> targetStatements;
 	
-	public SqlReader() throws FileNotFoundException, MalformedInputException {
-		System.out.println("\n-- Reading of the statements");
+	public SqlReader(String file) throws FileNotFoundException, MalformedInputException {
+		System.out.println("\n-- Reading of the statements ("+file+")");
+		
+		sqlFile = new File(file);
 		Scanner scanner = new Scanner(sqlFile);
-		scanner.useDelimiter(Pattern.compile("[.*][;][.*]"));
+		scanner.useDelimiter(Pattern.compile("[;]"));
 		statements = new ArrayList<String>();
-		targetStatements = new HashMap<Integer, String>();
+		targetStatements = new ArrayList<String>();
 		sourceStatements = new HashMap<Integer, String>();
 		
 		while (scanner.hasNext()) {
-			statements.add(scanner.next().replace(";", "").replaceAll("[\n]", "").replaceAll("[\n]", " "));
+			String s = scanner.next().replaceAll("(\t)+", " ").replaceAll("(\n)+", " ");
+			// clear the spaces
+			s = s.replaceAll("[ ]{2,}", " ");
+			s = s.replaceAll("^[\\s]", "");
+			// fix a bug (an empty string is not a statement)
+			if (s.isEmpty() || s.length() < 2) {
+				continue;
+			} else {
+				statements.add(s);
+			}
 		}
 		
-		// for the target
-		int i = 0;
 		// for the source
 		int j = 0;
 		for (String s : statements) {
@@ -43,14 +52,13 @@ public class SqlReader {
 
 			// no source statement
 			if (numberOfSourceStatements == 0) {
-				targetStatements.put(i, target);
-				i++;
+				targetStatements.add(target);
 				continue;
 			}
 			
 			if (numberOfSourceStatements != s.replaceAll("\\]", "").length()) {
 				System.out.println("ERROR: You have an error in "+sqlFile.getName()+". The number of opening square brackets does not meet the " +
-						"number of closing ones int the statement #"+(i+1)+".");
+						"number of closing ones int the statement #"+(targetStatements.size()+1)+".");
 				throw new MalformedInputException(2);
 			}
 
@@ -64,8 +72,7 @@ public class SqlReader {
 				source = source.substring(close+1);
 				j++;
 			}
-			targetStatements.put(i, target);
-			i++;
+			targetStatements.add(target);
 		}
 	}
 	
@@ -83,7 +90,7 @@ public class SqlReader {
 	}
 
 	
-	public Map<Integer, String> getTargetStatements() {
+	public List<String> getTargetStatements() {
 		return targetStatements;
 	}
 

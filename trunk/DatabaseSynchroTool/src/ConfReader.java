@@ -21,7 +21,7 @@ import org.xml.sax.SAXException;
  */
 public class ConfReader {
 	
-	private static final File xml = new File("config.xml");
+	private final File xml;
 	
 	private Server sourceServer;
 	private Server targetServer;
@@ -32,8 +32,11 @@ public class ConfReader {
 	 * @throws IOException
 	 * @throws SAXException
 	 */
-	public ConfReader () throws ParserConfigurationException, IOException, SAXException {
-		System.out.println("\n-- Reading of the configuration");
+	public ConfReader (String file) throws ParserConfigurationException, IOException, SAXException {
+		System.out.println("\n-- Reading of the configuration ("+file+")");
+		
+		xml = new File(file);
+		
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder constructor = factory.newDocumentBuilder();
 		Document document = constructor.parse(xml);
@@ -109,9 +112,9 @@ public class ConfReader {
 		return sourceServer;
 	}
 
+	
 	public Server getTargetServer() {
 		return targetServer;
 	}
 
-	
 }
