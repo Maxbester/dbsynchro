@@ -119,6 +119,17 @@ public class Server {
 	public void setDriver(String driver) {
 		this.driver = driver;
 	}
+	
+	@Override
+	public String toString() {
+		String res;
+		res = "Name:\t"+name+"\n";
+		res += "Url:\t"+url+"\n";
+		res += "Login:\t"+login+"\n";
+		res += "Pwd:\t*************\n";
+		res += "Driver:\t"+driver;
+		return res;
+	}
 
 	
 }
