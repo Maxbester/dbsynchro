@@ -20,6 +20,7 @@ public class Server {
 	private String login;
 	private String password;
 	private String driver;
+	private Connection connection;
 	
 	
 	public Server(String name, String url, String login, String password, String driver) {
@@ -30,12 +31,13 @@ public class Server {
 		this.driver = driver;
 	}
 
-    protected Connection connect() throws ClassNotFoundException, SQLException {
-        Connection conn = null;
-        System.out.println("Connection to: "+this.login+"@"+this.url);
-        Class.forName(driver);
-        conn = DriverManager.getConnection("jdbc:mysql:"+url, login, password);
-        return conn;
+    protected Connection getConnect() throws ClassNotFoundException, SQLException {
+    	if (connection == null) {
+	        System.out.println("Connection to: "+this.login+"@"+this.url);
+	        Class.forName(driver);
+	        connection = DriverManager.getConnection("jdbc:mysql:"+url, login, password);
+    	}
+        return connection;
     }
     
     /**
@@ -49,11 +51,9 @@ public class Server {
     public int simpleStatement (String statement) throws SQLException, ClassNotFoundException {
     	if (statement == null)
     		return 0;
-        Connection conn = this.connect();
-        PreparedStatement insert = conn.prepareStatement(statement);
+        PreparedStatement insert = getConnect().prepareStatement(statement);
         int res = insert.executeUpdate();
         insert.close();
-        conn.close();
         return res;
     }
     
@@ -66,14 +66,12 @@ public class Server {
      */
     public List<ResultSet> selectStatement (String statement) throws ClassNotFoundException, SQLException {
         List<ResultSet> res = new ArrayList<ResultSet>();
-        Connection conn = connect();
-        Statement stat = conn.createStatement();
+        Statement stat = getConnect().createStatement();
         ResultSet rs = stat.executeQuery(statement);
         while (rs.next()) {
             res.add(rs);
         }
         rs.close();
-        conn.close();
         return res;
     }
 
@@ -91,6 +89,7 @@ public class Server {
 		return login;
 	}
 
+	
 	public String getDriver() {
 		return driver;
 	}
@@ -120,6 +119,7 @@ public class Server {
 		this.driver = driver;
 	}
 	
+	
 	@Override
 	public String toString() {
 		String res;
@@ -132,4 +132,7 @@ public class Server {
 	}
 
 	
+	public void closeConnection() throws SQLException, ClassNotFoundException {
+		getConnect().close();
+	}
 }

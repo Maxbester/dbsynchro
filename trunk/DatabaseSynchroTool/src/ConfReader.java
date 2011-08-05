@@ -13,6 +13,12 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+/**
+ * Reads the configuration in "config.xml".
+ * 
+ * @author Maxime Buisson
+ *
+ */
 public class ConfReader {
 	
 	private static final File xml = new File("config.xml");
@@ -20,7 +26,14 @@ public class ConfReader {
 	private Server sourceServer;
 	private Server targetServer;
 	
+	/**
+	 * Loads config.xml, parses it and create the sourceServer and the targetServer
+	 * @throws ParserConfigurationException
+	 * @throws IOException
+	 * @throws SAXException
+	 */
 	public ConfReader () throws ParserConfigurationException, IOException, SAXException {
+		System.out.println("\n-- Reading of the configuration");
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder constructor = factory.newDocumentBuilder();
 		Document document = constructor.parse(xml);
@@ -32,8 +45,8 @@ public class ConfReader {
 		
 		if (nodes.getLength() != 2) {
 			System.out.println("ERROR: Two servers must be specified in the configuration file: config.xml. One for the source and one for the target.");
+			throw new MalformedInputException(-1);
 		}
-
 		
 		for (int i = 0 ; i < nodes.getLength() ; i++) {
 			servers.put(((Element) nodes.item(i)).getAttribute("type"), (Element) nodes.item(i));
