@@ -2,14 +2,15 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.nio.charset.MalformedInputException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
+
 /**
- * Reads the statements in "statements.sql"
+ * Reads the statements in "statements.sql".
  * 
  * @author Maxime Buisson
  *
@@ -17,81 +18,59 @@ import java.util.regex.Pattern;
 public class SqlReader {
 	
 	private final File sqlFile;
-	private List<String> statements;
-	private Map<Integer, String> sourceStatements;
-	private List<String> targetStatements;
-	
-	public SqlReader(String file) throws FileNotFoundException, MalformedInputException {
-		System.out.println("\n-- Reading of the statements ("+file+")");
-		
-		sqlFile = new File(file);
-		Scanner scanner = new Scanner(sqlFile);
-		scanner.useDelimiter(Pattern.compile("[;]"));
-		statements = new ArrayList<String>();
-		targetStatements = new ArrayList<String>();
-		sourceStatements = new HashMap<Integer, String>();
-		
-		while (scanner.hasNext()) {
-			String s = scanner.next().replaceAll("(\t)+", " ").replaceAll("(\n)+", " ");
-			// clear the spaces
-			s = s.replaceAll("[ ]{2,}", " ");
-			s = s.replaceAll("^[\\s]", "");
-			// fix a bug (an empty string is not a statement)
-			if (s.isEmpty() || s.length() < 2) {
-				continue;
-			} else {
-				statements.add(s);
-			}
-		}
-		
-		// for the source
-		int j = 0;
-		for (String s : statements) {
-			String target = s;
-			int numberOfSourceStatements = s.replaceAll("\\[", "").length();
-
-			// no source statement
-			if (numberOfSourceStatements == 0) {
-				targetStatements.add(target);
-				continue;
-			}
-			
-			if (numberOfSourceStatements != s.replaceAll("\\]", "").length()) {
-				System.out.println("ERROR: You have an error in "+sqlFile.getName()+". The number of opening square brackets does not meet the " +
-						"number of closing ones int the statement #"+(targetStatements.size()+1)+".");
-				throw new MalformedInputException(2);
-			}
-
-			int open, close;
-			String source = target;
-			while (source.contains("[")) {
-				open = source.indexOf("[", 0);
-				close = source.indexOf("]", 0);
-				sourceStatements.put(j, source.substring(open+1, close));
-				target = target.replace(sourceStatements.get(j), new Integer(j).toString());
-				source = source.substring(close+1);
-				j++;
-			}
-			targetStatements.add(target);
-		}
-	}
+	private List<String> sQueries;
+	private Multimap<Integer, String> dQueries;
 	
 	/**
-	 * Unrefined statements like they appear in the statement file.
+	 * Analyzes the query file. The results are stocked in sQueries and dQueries.
+	 * @param file The path and name of the file that contains the queries.
+	 * @throws FileNotFoundException
+	 * @throws MalformedInputException
+	 */
+	public SqlReader(String file) throws FileNotFoundException, MalformedInputException {
+		System.out.println("\n-- Reading of the statements ("+file+")");
+
+		sqlFile = new File(file);
+		Scanner scanner = new Scanner(sqlFile);
+		scanner.useDelimiter(Pattern.compile("[\\n]"));
+		sQueries = new ArrayList<String>();
+		dQueries = ArrayListMultimap.create();
+		
+		int i=0;
+		while (scanner.hasNext()) {
+			String s = scanner.next();
+//			System.out.println("SCANNER: "+s);
+			if (s.startsWith("s:")) {
+				s = s.replaceAll("s:", "");
+				sQueries.add(s);
+				i = sQueries.size();
+			} else if (s.startsWith("d:")) {
+				s = s.replaceAll("d:", "");
+				dQueries.put(i-1, s);
+			} else if (s.startsWith("--")) {
+				// commentaire
+			} else {
+				System.out.println("ERROR: the query file ("+file+") is malformed.");
+				throw new MalformedInputException(3);
+			}
+		}
+		System.out.println("SQL file reading OK");
+	}
+	
+
+	/**
+	 * Returns the queries that will be executed on the distant database.
 	 * @return
 	 */
-	public List<String> getStatements() {
-		return this.statements;
+	public Multimap<Integer, String> getdQueries() {
+		return dQueries;
 	}
 
-
-	public Map<Integer, String> getSourceStatements() {
-		return sourceStatements;
+	/**
+	 * Returns the queries that will be executed on the source database.
+	 * @return
+	 */
+	public List<String> getsQueries() {
+		return sQueries;
 	}
-
-	
-	public List<String> getTargetStatements() {
-		return targetStatements;
-	}
-
 }

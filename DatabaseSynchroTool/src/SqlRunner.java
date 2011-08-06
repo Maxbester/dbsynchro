@@ -1,62 +1,53 @@
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
+import com.google.common.collect.Multimap;
 
+/**
+ * 
+ * @author Maxime Buisson
+ *
+ */
 public class SqlRunner {
-	
-	public SqlRunner(Map<Integer, String> sourceStatements,	List<String> targetStatements, Server sourceServer, Server targetServer) throws ClassNotFoundException, SQLException {
 
-		// connection to the local server
+	/**
+	 * Runs the input queries. The results are stocked in specific fields in the Server objects.
+	 * @param source
+	 * @param distant
+	 * @param sourceServer
+	 * @param targetServer
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 */
+	public SqlRunner(List<String> source, Multimap<Integer, String> distant, Server sourceServer, Server targetServer) throws ClassNotFoundException, SQLException {
+		System.out.println("\n-- Run SQL statements");
+
+		ResultSet sourceStatement;
 		sourceServer.connect();
+		targetServer.connect();
 
-		for (String target : targetStatements) {
-			// we clear the memory for each statetemts
-			List<ResultSet> res = new ArrayList<ResultSet>();
-			
-			// we run the local statement needed for the current distant statement
-			for (int i = 0 ; i < countInternStat(target) ; i++) {
-				res.add(sourceServer.selectStatement("select "+sourceStatements.get(i)+" from "+getTable(sourceStatements.get(i))));
+		for (int i = 0 ; i < source.size() ; i++) {
+			sourceStatement = sourceServer.selectStatement(source.get(i));
+			System.out.println("[S] QUERY = "+source.get(i));
+			while (sourceStatement.next()) {
+				for (String distantQuery : distant.get(i)) {
+					int open = 0;
+					int close = 0;
+					String temp = distantQuery;
+					while (temp.contains("[")) {
+						open = temp.indexOf("[");
+						close = temp.indexOf("]");
+						int column = Integer.parseInt(temp.substring(open+1, close));
+						distantQuery = distantQuery.replace(temp.substring(open, close+1), sourceStatement.getString(column));
+						temp = temp.substring(close+1);
+					}
+					System.out.println("[D] QUERY = "+distantQuery);
+					targetServer.simpleStatement(distantQuery);
+				}
 			}
-
-			for (int i = 0 ; i < res.size() ; i++) {
-				target = target.replace("\\["+i+"\\]", res.get(i).getString(getColumn(sourceStatements.get(i))));
-			}
-			
-			// connection to the distant server
-			targetServer.connect();
-			targetServer.simpleStatement(target);
-			targetServer.disconnect();
-			
 		}
+		targetServer.disconnect();
 		sourceServer.disconnect();
-	}
-	
-	private int countInternStat(String s) {
-		return s.replaceAll("\\[", "").length();
-	}
-	
-	/**
-	 * Get the table name of string that looks like: "product.id". Product corresponds to the name of the table and id to the name of the column.
-	 * @param s
-	 * @return
-	 */
-	private String getTable(String s) {
-		if (!s.contains("."))
-			return s;
-		return s.substring(0,s.indexOf(".")-1);
-	}
-	
-	/**
-	 * Get the column name of string that looks like: "product.id". Product corresponds to the name of the table and id to the name of the column.
-	 * @param s
-	 * @return
-	 */
-	private String getColumn(String s) {
-		if (!s.contains("."))
-			return s;
-		return s.substring(s.indexOf(".")+1);
 	}
 }
