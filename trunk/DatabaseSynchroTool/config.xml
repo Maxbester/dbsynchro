@@ -15,7 +15,7 @@ http://www.khelll.com/blog/mysql/changing-database-encoding-from-latin-to-utf8/
 		<name>MS Server</name>
 		<url>//localhost/test1</url>
 		<login>root</login>
-		<password>redcar</password>
+		<password>test</password>
 		<driver>com.mysql.jdbc.Driver</driver>
 	</server>
 	<server type="target">
@@ -24,7 +24,7 @@ http://www.khelll.com/blog/mysql/changing-database-encoding-from-latin-to-utf8/
 <!--		<url>//webserver.speedcrete.co.uk/speedcrete</url>-->
 		<url>//localhost/test2</url>
 		<login>root</login>
-		<password>redcar</password>
+		<password>test</password>
 		<driver>com.mysql.jdbc.Driver</driver>
 	</server>
 </config>
