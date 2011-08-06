@@ -20,8 +20,7 @@ public class Server {
 	private String driver;
 	private Connection connection;
 	private ResultSet rs;
-	
-	
+
 	public Server(String name, String url, String login, String password, String driver) {
 		this.name = name;
 		this.url = url;
@@ -133,5 +132,6 @@ public class Server {
 			rs.close();
 		}
 		connect().close();
+		System.out.println("Disconnected from: "+this.url);
 	}
 }

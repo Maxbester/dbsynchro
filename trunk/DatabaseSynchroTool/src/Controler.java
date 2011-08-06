@@ -1,7 +1,9 @@
 import java.io.IOException;
 import java.nio.charset.MalformedInputException;
+import java.sql.SQLException;
 import java.util.Date;
 
+import javax.mail.MessagingException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
@@ -19,8 +21,8 @@ public class Controler {
 
 	/**
 	 * The launcher of the program. You should run the program like: "java -jar DbSynchroTool.jar -c config.xml -s stats.sql"
-	 * @param args
-	 * @throws Exception 
+	 * @param args 
+	 * @throws MessagingException 
 	 */
 	public static void main(String[] args) {
 		if(!checkParameters(args)) {
@@ -28,49 +30,81 @@ public class Controler {
 		}
 		
 		System.out.println("Database Synchro Tool - "+ new Date());
+
+		Email email = null;
+		
+		ConfReader cr = null;
 		
 		try {
+
+		try {
 			// reading of the configuration
-			ConfReader cr = new ConfReader(configFile);
+			cr = new ConfReader(configFile);
 
 			System.out.println(cr.getSourceServer());
 			
 			System.out.println("\n");
 
-			System.out.println(cr.getTargetServer());
-			
-//			cr.getTargetServer().connect();
-//			ResultSet res = cr.getTargetServer().selectStatement("select * from items limit 50;");
-//	        while (res.next()) {
-//	        	System.out.println(res.getString("name"));
-//	        }
-//			cr.getTargetServer().disconnect();
+			System.out.println(cr.getDistantServer());
 
+			if (cr.isEmail()) {
+				email = cr.getEmail();
+				System.out.println(email);
+			}
 
 			//reading of the statements
 			SqlReader sr = new SqlReader(statsFile);
 
-			System.out.println("Number of statements: "+sr.getStatements().size());
-//			System.out.println("Statements: "+sr.getStatements());
+			System.out.println("Number of local statements: "+sr.getsQueries().size());
+			System.out.println("Local statements: "+sr.getsQueries());
 
-			System.out.println("Number of local statements: "+sr.getSourceStatements().size());
-			System.out.println("Local statements: "+sr.getSourceStatements());
-
-			System.out.println("Number of distant statements: "+sr.getTargetStatements().size());
-			System.out.println("Distant statements: "+sr.getTargetStatements());
+			System.out.println("Number of distant statements: "+sr.getdQueries().size());
+			System.out.println("Distant statements: "+sr.getdQueries());
+			
+			new SqlRunner(sr.getsQueries(), sr.getdQueries(), cr.getSourceServer(), cr.getDistantServer());
 			
 			System.out.println("End of the program - "+ new Date());
 
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
+			if (email != null) {
+				email.send(e.getMessage());
+			}
 		} catch (SAXException e) {
 			e.printStackTrace();
+			if (email != null) {
+				email.send(e.getMessage());
+			}
 		} catch (MalformedInputException e) {
+			if (email != null) {
+				email.send(e.getMessage());
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
+			if (email != null) {
+				email.send(e.getMessage());
+			}
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+			if (email != null) {
+				email.send(e.getMessage());
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			if (email != null) {
+				email.send(e.getMessage());
+			}
+		}
+		} catch (MessagingException e1) {
+			System.err.println("EMAIL not sent: "+e1.getMessage());
 		}
 	}
 
+	/**
+	 * Checks the input parameters that are given to the main program.
+	 * @param args
+	 * @return
+	 */
 	public static boolean checkParameters (String[] args) {
 		if (args.length < 4) {
 			System.err.println("\nWrong use of this program. You must specify the location of the config file and the location of the statements file.");
@@ -78,8 +112,8 @@ public class Controler {
 					"List of commands:\n" +
 					"\t-c, --config FILE | DIRECTORY\n" +
 					"\t\tThe location of the xml file which contains the database configuration of both local and distant servers.\n\n" +
-					"\t-s, --statements FILE | DIRECTORY\n" +
-					"\t\tThe location of the sql file which contains the sql statements to run.\n");
+					"\t-q, --queries FILE | DIRECTORY\n" +
+					"\t\tThe location of the sql file which contains SQL queries to run.\n");
 			return false;
 		}
 
@@ -91,7 +125,7 @@ public class Controler {
 				config = true;
 				configFile = args[i+1];
 			}
-			if (args[i].contains("-s") || args[i].contains("--statements")) {
+			if (args[i].contains("-q") || args[i].contains("--queries")) {
 				stats = true;
 				statsFile = args[i+1];
 			}
@@ -103,8 +137,8 @@ public class Controler {
 					"List of commands:\n" +
 					"\t-c, --config FILE | DIRECTORY\n" +
 					"\t\tThe location of the xml file which contains the database configuration of both local and distant servers.\n\n" +
-					"\t-s, --statements FILE | DIRECTORY\n" +
-					"\t\tThe location of the sql file which contains the sql statements to run.\n");
+					"\t-q, --queries FILE | DIRECTORY\n" +
+					"\t\tThe location of the sql file which contains SQL queries to run.\n");
 			return false;
 		}
 		return true;
