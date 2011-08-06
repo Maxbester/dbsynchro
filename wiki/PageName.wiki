@@ -1,4 +1,4 @@
-#summary Welcome on the DatabaseSynchroTool Wiki
+#summary *Welcome on the DatabaseSynchroTool Wiki*
 
 = Introduction =
 
