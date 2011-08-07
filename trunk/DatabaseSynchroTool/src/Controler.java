@@ -1,7 +1,9 @@
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.MalformedInputException;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.logging.Logger;
 
 import javax.mail.MessagingException;
 import javax.xml.parsers.ParserConfigurationException;
@@ -18,6 +20,8 @@ public class Controler {
 	
 	private static String configFile;
 	private static String statsFile;
+	
+	private static Logger log = Logger.getLogger("log");
 
 	/**
 	 * The launcher of the program. You should run the program like: "java -jar DbSynchroTool.jar -c config.xml -s stats.sql"
@@ -25,21 +29,36 @@ public class Controler {
 	 * @throws MessagingException 
 	 */
 	public static void main(String[] args) {
+		
 		if(!checkParameters(args)) {
 			return;
 		}
 		
 		System.out.println("Database Synchro Tool - "+ new Date());
+		
+		try {
+			test();
+		} catch (MessagingException e1) {
+			System.err.println("EMAIL not sent: "+e1.getMessage());
+		}
+		System.out.println("End of the program - "+ new Date());
+	}
 
+	public static void test() throws MessagingException {
 		Email email = null;
 		
 		ConfReader cr = null;
-		
-		try {
 
-		try {
 			// reading of the configuration
-			cr = new ConfReader(configFile);
+			try {
+				cr = new ConfReader(configFile);
+			} catch (ParserConfigurationException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (SAXException e) {
+				e.printStackTrace();
+			}
 
 			System.out.println(cr.getSourceServer());
 			
@@ -53,7 +72,16 @@ public class Controler {
 			}
 
 			//reading of the statements
-			SqlReader sr = new SqlReader(statsFile);
+			SqlReader sr = null;
+			try {
+				sr = new SqlReader(statsFile);
+			} catch (MalformedInputException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (FileNotFoundException e) {
+				email.send(e.getMessage());
+				e.printStackTrace();
+			}
 
 			System.out.println("Number of local statements: "+sr.getsQueries().size());
 			System.out.println("Local statements: "+sr.getsQueries());
@@ -61,45 +89,17 @@ public class Controler {
 			System.out.println("Number of distant statements: "+sr.getdQueries().size());
 			System.out.println("Distant statements: "+sr.getdQueries());
 			
-			new SqlRunner(sr.getsQueries(), sr.getdQueries(), cr.getSourceServer(), cr.getDistantServer());
-			
-			System.out.println("End of the program - "+ new Date());
-
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-			if (email != null) {
+			try {
+				new SqlRunner(sr.getsQueries(), sr.getdQueries(), cr.getSourceServer(), cr.getDistantServer());
+			} catch (ClassNotFoundException e) {
 				email.send(e.getMessage());
-			}
-		} catch (SAXException e) {
-			e.printStackTrace();
-			if (email != null) {
+				e.printStackTrace();
+			} catch (SQLException e) {
 				email.send(e.getMessage());
+				e.printStackTrace();
 			}
-		} catch (MalformedInputException e) {
-			if (email != null) {
-				email.send(e.getMessage());
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-			if (email != null) {
-				email.send(e.getMessage());
-			}
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-			if (email != null) {
-				email.send(e.getMessage());
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-			if (email != null) {
-				email.send(e.getMessage());
-			}
-		}
-		} catch (MessagingException e1) {
-			System.err.println("EMAIL not sent: "+e1.getMessage());
-		}
 	}
-
+	
 	/**
 	 * Checks the input parameters that are given to the main program.
 	 * @param args
@@ -108,6 +108,7 @@ public class Controler {
 	public static boolean checkParameters (String[] args) {
 		if (args.length < 4) {
 			System.err.println("\nWrong use of this program. You must specify the location of the config file and the location of the statements file.");
+			log.config("Wrong use of this program. You must specify the location of the config file and the location of the statements file.");
 			System.out.println("For information about DatabaseSynchroTool, visit: http://code.google.com/p/dbsynchro/\n" +
 					"List of commands:\n" +
 					"\t-c, --config FILE | DIRECTORY\n" +
@@ -133,6 +134,7 @@ public class Controler {
 		
 		if (!config || !stats) {
 			System.err.println("\nWrong use of this program. You must specify the location of the config file and the location of the statements file.");
+			log.config("Wrong use of this program. You must specify the location of the config file and the location of the statements file.");
 			System.out.println("For information about DatabaseSynchroTool, visit: http://code.google.com/p/dbsynchro/\n" +
 					"List of commands:\n" +
 					"\t-c, --config FILE | DIRECTORY\n" +

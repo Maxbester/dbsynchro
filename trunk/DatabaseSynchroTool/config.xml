@@ -13,18 +13,19 @@ http://www.khelll.com/blog/mysql/changing-database-encoding-from-latin-to-utf8/
 	</email>
 	<server type="source">
 		<name>MS Server</name>
-		<url>//localhost/test1</url>
+		<!--<url>jdbc:sqlserver://localhost/test1</url>-->
+		<url>jdbc:mysql://localhost/test1?useSSL=true</url>
 		<login>root</login>
-		<password>test</password>
+		<password>redcar</password>
 		<driver>com.mysql.jdbc.Driver</driver>
 	</server>
 	<server type="target">
 		<name>Linux Web Server</name>
 <!-- To test the connection and rights you can run: mysql -u root -h webserver.speedcrete.co.uk -p		-->
 <!--		<url>//webserver.speedcrete.co.uk/speedcrete</url>-->
-		<url>//localhost/test2</url>
+		<url>jdbc:mysql://localhost/test2</url>
 		<login>root</login>
-		<password>test</password>
+		<password>redcar</password>
 		<driver>com.mysql.jdbc.Driver</driver>
 	</server>
 </config>
