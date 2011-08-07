@@ -159,7 +159,7 @@ public class ConfReader {
 			System.out.println("WARNING: no email recipients in the configuration file: "+file+". No email will be sent.");
 		}
 	}
-	
+
 	/**
 	 * Return the source server information
 	 * @return
@@ -187,4 +187,5 @@ public class ConfReader {
 	public Email getEmail() {
 		return email;
 	}
+
 }

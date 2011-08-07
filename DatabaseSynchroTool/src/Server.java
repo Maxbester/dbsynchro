@@ -34,7 +34,7 @@ public class Server {
 	        System.out.println("Connection to: "+this.url);
 	        System.out.println("Trying to connect...");
 	        Class.forName(driver);
-	        connection = DriverManager.getConnection("jdbc:mysql:"+url, login, password);
+	        connection = DriverManager.getConnection(url, login, password);
 	        System.out.println("Connection established.");
     	}
         return connection;
