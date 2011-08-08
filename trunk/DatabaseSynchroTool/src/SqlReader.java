@@ -4,6 +4,7 @@ import java.nio.charset.MalformedInputException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import com.google.common.collect.ArrayListMultimap;
@@ -24,11 +25,12 @@ public class SqlReader {
 	/**
 	 * Analyzes the query file. The results are stocked in sQueries and dQueries.
 	 * @param file The path and name of the file that contains the queries.
+	 * @param log 
 	 * @throws FileNotFoundException
 	 * @throws MalformedInputException
 	 */
-	public SqlReader(String file) throws FileNotFoundException, MalformedInputException {
-		System.out.println("\n-- Reading of the statements ("+file+")");
+	public SqlReader(String file, Logger log) throws FileNotFoundException, MalformedInputException {
+		log.info("\n-- Reading of the statements ("+file+")");
 
 		sqlFile = new File(file);
 		Scanner scanner = new Scanner(sqlFile);
@@ -50,11 +52,11 @@ public class SqlReader {
 			} else if (s.startsWith("--")) {
 				// commentaire
 			} else {
-				System.out.println("ERROR: the query file ("+file+") is malformed.");
+				log.severe("ERROR: the query file ("+file+") is malformed.");
 				throw new MalformedInputException(3);
 			}
 		}
-		System.out.println("SQL file reading OK");
+		log.config("SQL file reading OK");
 	}
 	
 
