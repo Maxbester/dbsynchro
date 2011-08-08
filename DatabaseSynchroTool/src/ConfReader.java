@@ -3,6 +3,8 @@ import java.io.IOException;
 import java.nio.charset.MalformedInputException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -26,15 +28,21 @@ public class ConfReader {
 	private Server sourceServer;
 	private Server distantServer;
 	private Email email;
+	private Logger log;
 	
 	/**
 	 * Loads config.xml, parses it and create the sourceServer and the distantServer
+	 * @param log 
+	 * @param file
 	 * @throws ParserConfigurationException
 	 * @throws IOException
 	 * @throws SAXException
 	 */
-	public ConfReader (String file) throws ParserConfigurationException, IOException, SAXException {
-		System.out.println("\n-- Reading of the configuration ("+file+")");
+	public ConfReader (Logger log, String file) throws ParserConfigurationException, IOException, SAXException {
+		this.log = log;
+		this.log.setLevel(Level.parse("INFO"));
+
+		this.log.info("\n-- Reading of the configuration ("+file+")");
 		
 		xml = new File(file);
 		
@@ -44,11 +52,13 @@ public class ConfReader {
 		
 		Element root = document.getDocumentElement();
 
+		loggerReader(root, file);
+		
 		emailReader(root, file);
 
 		serversReader(root, file);
 		
-		System.out.println("Config file reading OK");
+		this.log.config("Config file reading OK");
 	}
 	
 	/**
@@ -104,7 +114,7 @@ public class ConfReader {
 		password = (Element) source.getElementsByTagName("password").item(0);
 		driver = (Element) source.getElementsByTagName("driver").item(0);
 		
-		sourceServer = new Server(name.getTextContent(), url.getTextContent(), login.getTextContent(), password.getTextContent(), driver.getTextContent());
+		sourceServer = new Server(log, name.getTextContent(), url.getTextContent(), login.getTextContent(), password.getTextContent(), driver.getTextContent());
 		
 		if (distant.getElementsByTagName("name").getLength() != 1 || distant.getElementsByTagName("url").getLength() != 1 ||
 				distant.getElementsByTagName("login").getLength() != 1 || distant.getElementsByTagName("password").getLength() != 1 ||
@@ -119,14 +129,14 @@ public class ConfReader {
 		password = (Element) distant.getElementsByTagName("password").item(0);
 		driver = (Element) distant.getElementsByTagName("driver").item(0);
 		
-		distantServer = new Server(name.getTextContent(), url.getTextContent(), login.getTextContent(), password.getTextContent(), driver.getTextContent());		
+		distantServer = new Server(log, name.getTextContent(), url.getTextContent(), login.getTextContent(), password.getTextContent(), driver.getTextContent());		
 	}
 
 	private void emailReader(Element root, String file) throws MalformedInputException {
 		NodeList nodes = root.getElementsByTagName("email");
 		
 		if (nodes.getLength() > 1) {
-			System.out.println("ERROR: Only one email must be specified in the configuration file: "+file+".");
+			this.log.severe("ERROR: Only one email must be specified in the configuration file: "+file+".");
 			throw new MalformedInputException(0);
 		}
 		
@@ -139,7 +149,7 @@ public class ConfReader {
 		
 		if (email.getElementsByTagName("from").getLength() != 1 || email.getElementsByTagName("smtp").getLength() != 1 ||
 				 email.getElementsByTagName("subject").getLength() != 1) {
-			System.out.println("ERROR: Have a look at the email conf in the configuration file: "+file+".");
+			this.log.severe("ERROR: Have a look at the email conf in the configuration file: "+file+".");
 			throw new MalformedInputException(1);
 		}
 		
@@ -156,10 +166,33 @@ public class ConfReader {
 			}			
 		}
 		else {
-			System.out.println("WARNING: no email recipients in the configuration file: "+file+". No email will be sent.");
+			this.log.warning("WARNING: no email recipients in the configuration file: "+file+". No email will be sent.");
 		}
 	}
 
+	private void loggerReader(Element root, String file) throws MalformedInputException {
+		NodeList nodes = root.getElementsByTagName("logger");
+		
+		if (nodes.getLength() > 1) {
+			this.log.severe("ERROR: Only one logger must be specified in the configuration file: "+file+".");
+			throw new MalformedInputException(0);
+		}
+		
+		// no logger
+		if (nodes.getLength() == 0) {
+			return;
+		}
+		
+		Element log = (Element) nodes.item(0);
+		
+		if (log.getElementsByTagName("logger").getLength() != 1) {
+			this.log.severe("ERROR: Have a look at the logger conf in the configuration file: "+file+".");
+			throw new MalformedInputException(1);
+		}
+		Element level = (Element) log.getElementsByTagName("logger").item(0);
+		this.log.setLevel(Level.parse(level.getAttribute("level")));
+	}
+	
 	/**
 	 * Return the source server information
 	 * @return
@@ -187,5 +220,7 @@ public class ConfReader {
 	public Email getEmail() {
 		return email;
 	}
+
+
 
 }

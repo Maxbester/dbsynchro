@@ -4,6 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.logging.Logger;
 
 /**
  * Defines the information about a database server and method to modify its content. 
@@ -20,22 +21,36 @@ public class Server {
 	private String driver;
 	private Connection connection;
 	private ResultSet rs;
+	private Logger log;
 
-	public Server(String name, String url, String login, String password, String driver) {
+	public Server(Logger log, String name, String url, String login, String password, String driver) {
 		this.name = name;
 		this.url = url;
 		this.login = login;
 		this.password = password;
 		this.driver = driver;
+		this.log = log;
 	}
 
-    protected Connection connect() throws ClassNotFoundException, SQLException {
+    protected Connection connect() throws InstantiationException, IllegalAccessException, SQLException {
     	if (connection == null) {
-	        System.out.println("Connection to: "+this.url);
-	        System.out.println("Trying to connect...");
-	        Class.forName(driver);
-	        connection = DriverManager.getConnection(url, login, password);
-	        System.out.println("Connection established.");
+	        log.config("Connection to: "+this.url);
+	        log.config("Trying to connect...");
+	        try {
+				Class.forName(driver).newInstance();
+			} catch (ClassNotFoundException e) {
+				log.severe("ERROR: Can not find the driver: "+e.getMessage());
+				e.printStackTrace();
+			}
+			try {
+				connection = DriverManager.getConnection(url, login, password);
+				log.config("Connection established.");
+			}
+	        catch (SQLException e){
+	        	log.severe( "ERROR: Driver loaded, but cannot connect to db: "+e.getMessage());
+	        	log.warning("/!\\ Connection NOT established. /!\\");
+	        	throw new SQLException();
+	         }
     	}
         return connection;
     }
@@ -47,8 +62,10 @@ public class Server {
      * @return the row count for insert, update or delete, else 0
      * @throws SQLException
      * @throws ClassNotFoundException
+     * @throws IllegalAccessException 
+     * @throws InstantiationException 
      */
-    public int simpleStatement (String statement) throws SQLException, ClassNotFoundException {
+    public int simpleStatement (String statement) throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
     	if (statement == null)
     		return 0;
         PreparedStatement insert = connect().prepareStatement(statement);
@@ -63,8 +80,10 @@ public class Server {
      * @return
      * @throws SQLException 
      * @throws ClassNotFoundException 
+     * @throws IllegalAccessException 
+     * @throws InstantiationException 
      */
-    public ResultSet selectStatement (String statement) throws ClassNotFoundException, SQLException {
+    public ResultSet selectStatement (String statement) throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException {
         Statement stat = connect().createStatement();
         rs = stat.executeQuery(statement);
         return rs;
@@ -127,11 +146,11 @@ public class Server {
 	}
 
 	
-	public void disconnect() throws SQLException, ClassNotFoundException {
+	public void disconnect() throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
 		if (rs != null) {
 			rs.close();
 		}
 		connect().close();
-		System.out.println("Disconnected from: "+this.url);
+		log.config("Disconnected from: "+this.url);
 	}
 }

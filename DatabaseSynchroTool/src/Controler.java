@@ -21,7 +21,7 @@ public class Controler {
 	private static String configFile;
 	private static String statsFile;
 	
-	private static Logger log = Logger.getLogger("log");
+	private static Logger log = Logger.getLogger("DbSynchro.log");
 
 	/**
 	 * The launcher of the program. You should run the program like: "java -jar DbSynchroTool.jar -c config.xml -s stats.sql"
@@ -34,14 +34,16 @@ public class Controler {
 			return;
 		}
 		
-		System.out.println("Database Synchro Tool - "+ new Date());
+		log.info("Database Synchro Tool - "+ new Date());
 		
 		try {
 			test();
 		} catch (MessagingException e1) {
-			System.err.println("EMAIL not sent: "+e1.getMessage());
+			log.warning("EMAIL not sent: "+e1.getMessage());
 		}
-		System.out.println("End of the program - "+ new Date());
+		finally {
+			log.info("End of the program - "+ new Date());	
+		}
 	}
 
 	public static void test() throws MessagingException {
@@ -51,7 +53,7 @@ public class Controler {
 
 			// reading of the configuration
 			try {
-				cr = new ConfReader(configFile);
+				cr = new ConfReader(log, configFile);
 			} catch (ParserConfigurationException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -60,43 +62,53 @@ public class Controler {
 				e.printStackTrace();
 			}
 
-			System.out.println(cr.getSourceServer());
-			
-			System.out.println("\n");
+			log.config(cr.getSourceServer()+"\n");
 
-			System.out.println(cr.getDistantServer());
+			log.config(cr.getDistantServer().toString());
 
 			if (cr.isEmail()) {
 				email = cr.getEmail();
-				System.out.println(email);
+				log.config(email.toString());
 			}
 
 			//reading of the statements
 			SqlReader sr = null;
 			try {
-				sr = new SqlReader(statsFile);
+				sr = new SqlReader(statsFile, log);
 			} catch (MalformedInputException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
+				if (email != null) 
+					email.send(e.toString());
 			} catch (FileNotFoundException e) {
-				email.send(e.getMessage());
 				e.printStackTrace();
+				if (email != null) 
+					email.send(e.toString());
 			}
 
-			System.out.println("Number of local statements: "+sr.getsQueries().size());
-			System.out.println("Local statements: "+sr.getsQueries());
+			log.info("Number of local statements: "+sr.getsQueries().size());
+			log.config("Local statements: "+sr.getsQueries());
 
-			System.out.println("Number of distant statements: "+sr.getdQueries().size());
-			System.out.println("Distant statements: "+sr.getdQueries());
+			log.info("Number of distant statements: "+sr.getdQueries().size());
+			log.config("Distant statements: "+sr.getdQueries());
 			
 			try {
-				new SqlRunner(sr.getsQueries(), sr.getdQueries(), cr.getSourceServer(), cr.getDistantServer());
+				new SqlRunner(log, sr.getsQueries(), sr.getdQueries(), cr.getSourceServer(), cr.getDistantServer());
 			} catch (ClassNotFoundException e) {
-				email.send(e.getMessage());
 				e.printStackTrace();
+				if (email != null) 
+					email.send(e.toString());
 			} catch (SQLException e) {
-				email.send(e.getMessage());
 				e.printStackTrace();
+				if (email != null) 
+					email.send(e.toString());
+			} catch (InstantiationException e) {
+				e.printStackTrace();
+				if (email != null) 
+					email.send(e.toString());
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+				if (email != null) 
+					email.send(e.toString());
 			}
 	}
 	
@@ -107,9 +119,9 @@ public class Controler {
 	 */
 	public static boolean checkParameters (String[] args) {
 		if (args.length < 4) {
-			System.err.println("\nWrong use of this program. You must specify the location of the config file and the location of the statements file.");
-			log.config("Wrong use of this program. You must specify the location of the config file and the location of the statements file.");
-			System.out.println("For information about DatabaseSynchroTool, visit: http://code.google.com/p/dbsynchro/\n" +
+			log.severe("\nWrong use of this program. You must specify the location of the config file and the location of the statements file.");
+			log.severe("Wrong use of this program. You must specify the location of the config file and the location of the statements file.");
+			log.severe("For information about DatabaseSynchroTool, visit: http://code.google.com/p/dbsynchro/\n" +
 					"List of commands:\n" +
 					"\t-c, --config FILE | DIRECTORY\n" +
 					"\t\tThe location of the xml file which contains the database configuration of both local and distant servers.\n\n" +
@@ -133,9 +145,9 @@ public class Controler {
 		}
 		
 		if (!config || !stats) {
-			System.err.println("\nWrong use of this program. You must specify the location of the config file and the location of the statements file.");
-			log.config("Wrong use of this program. You must specify the location of the config file and the location of the statements file.");
-			System.out.println("For information about DatabaseSynchroTool, visit: http://code.google.com/p/dbsynchro/\n" +
+			log.severe("\nWrong use of this program. You must specify the location of the config file and the location of the statements file.");
+			log.severe("Wrong use of this program. You must specify the location of the config file and the location of the statements file.");
+			log.severe("For information about DatabaseSynchroTool, visit: http://code.google.com/p/dbsynchro/\n" +
 					"List of commands:\n" +
 					"\t-c, --config FILE | DIRECTORY\n" +
 					"\t\tThe location of the xml file which contains the database configuration of both local and distant servers.\n\n" +
