@@ -1,0 +1,5 @@
+# Presentation and main page of the wiki
+
+== Installation ==
+
+First of all, download the last version of the software [http://code.google.com/p/dbsynchro/downloads/list here].
