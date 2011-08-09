@@ -1,0 +1,15 @@
+#summary Downloads page.
+
+= Downloads =
+
+== Version 1.1 ==
+This version contains a system of logging which use the Java API.
+
+You can download the jar file and the associated files below. Choose your archive format.
+  * [http://code.google.com/p/dbsynchro/downloads/detail?name=DbSyncrho-1.1.tar.gz&can=2&q= .tar.gz]
+  * [http://code.google.com/p/dbsynchro/downloads/detail?name=DbSynchro-1.1.zip&can=2&q= .zip]
+
+== Version 1.0 ==
+First version of this software.
+  * [http://code.google.com/p/dbsynchro/downloads/detail?name=DbSynchroTool.tar.gz&can=2&q= .tar.gz]
+  * [http://code.google.com/p/dbsynchro/downloads/detail?name=DbSynchroTool.zip&can=2&q== .zip]
