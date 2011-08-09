@@ -20,7 +20,7 @@ If this software does not work with your server, please contact us or [http://co
 
 == Installation ==
 
-First of all, download the last version of the software [http://code.google.com/p/dbsynchro/downloads/list here].
+First of all, download the last version of the software [Downloads here].
 
 ==How to use this program?==
 
