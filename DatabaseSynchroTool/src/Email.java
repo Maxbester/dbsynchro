@@ -1,6 +1,7 @@
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -21,6 +22,7 @@ public class Email {
 	private final String port;
 	private final String subject;
 	private Set<String> recipients;
+	private final Logger log = Logger.getLogger(Email.class.getName());
 
 	public Email(String from, String smtp, String port, String subject) {
 		this.from = from;
@@ -28,6 +30,8 @@ public class Email {
 		this.port = port;
 		this.subject = subject;
 		this.recipients = new HashSet<String>();
+		log.addHandler(Controler.getHandler());
+		log.setLevel(Controler.getLevel());
 	}
 
 	public String getFrom() {
@@ -61,7 +65,7 @@ public class Email {
 	@Override
 	public String toString() {
 		String res;
-		res = "\n("+smtp+":"+port+") - from "+from+" to "+recipients+", subject: "+subject+".";
+		res = "("+smtp+":"+port+") - from "+from+" to "+recipients+", subject: "+subject+".";
 		return res;
 	}
 
