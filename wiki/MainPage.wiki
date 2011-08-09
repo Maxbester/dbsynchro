@@ -1,4 +1,4 @@
-# Presentation and main page of the wiki
+#sidebar TableOfContents
 
 == Installation ==
 
