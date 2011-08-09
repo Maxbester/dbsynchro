@@ -1,4 +1,5 @@
 #summary DbSynchroTool details
+#labels Featured
 #sidebar SideBar
 
 =Home page=
