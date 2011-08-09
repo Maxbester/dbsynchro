@@ -1,4 +1,4 @@
-#summary A walkthrough of the library
+#summary DbSynchroTool details
 #sidebar TableOfContents
 
 =Home page=
