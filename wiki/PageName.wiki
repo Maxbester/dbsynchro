@@ -1,5 +1,0 @@
-#summary Welcome on the DatabaseSynchroTool Wiki
-
-= Introduction =
-
-This software aims at helping Web or Database Administrators to update or synchronize two different databases.
