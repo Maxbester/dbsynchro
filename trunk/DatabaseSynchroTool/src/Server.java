@@ -21,15 +21,16 @@ public class Server {
 	private String driver;
 	private Connection connection;
 	private ResultSet rs;
-	private Logger log;
+	private final Logger log = Logger.getLogger(Server.class.getName());
 
-	public Server(Logger log, String name, String url, String login, String password, String driver) {
+	public Server(String name, String url, String login, String password, String driver) {
 		this.name = name;
 		this.url = url;
 		this.login = login;
 		this.password = password;
 		this.driver = driver;
-		this.log = log;
+		log.addHandler(Controler.getHandler());
+		log.setLevel(Controler.getLevel());
 	}
 
     protected Connection connect() throws InstantiationException, IllegalAccessException, SQLException {
@@ -138,10 +139,10 @@ public class Server {
 	public String toString() {
 		String res;
 		res = "Name:\t"+name+"\n";
-		res += "Url:\t"+url+"\n";
-		res += "Login:\t"+login+"\n";
-		res += "Pwd:\t*************\n";
-		res += "Driver:\t"+driver;
+		res += "\t\t\tUrl:\t"+url+"\n";
+		res += "\t\t\tLogin:\t"+login+"\n";
+		res += "\t\t\tPwd:\t*************\n";
+		res += "\t\t\tDriver:\t"+driver;
 		return res;
 	}
 

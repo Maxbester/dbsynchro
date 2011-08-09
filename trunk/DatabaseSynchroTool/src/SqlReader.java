@@ -21,18 +21,21 @@ public class SqlReader {
 	private final File sqlFile;
 	private List<String> sQueries;
 	private Multimap<Integer, String> dQueries;
+	private final Logger log = Logger.getLogger(SqlReader.class.getName());
 	
 	/**
 	 * Analyzes the query file. The results are stocked in sQueries and dQueries.
-	 * @param file The path and name of the file that contains the queries.
-	 * @param log 
+	 * @param level 
+	 * @param statsFile The path and name of the file that contains the queries. 
 	 * @throws FileNotFoundException
 	 * @throws MalformedInputException
 	 */
-	public SqlReader(String file, Logger log) throws FileNotFoundException, MalformedInputException {
-		log.info("\n-- Reading of the statements ("+file+")");
+	public SqlReader(String statsFile) throws FileNotFoundException, MalformedInputException {
+		log.addHandler(Controler.getHandler());
+		log.setLevel(Controler.getLevel());
+		log.info(" -- Reading of the statements ("+statsFile+")");
 
-		sqlFile = new File(file);
+		sqlFile = new File(statsFile);
 		Scanner scanner = new Scanner(sqlFile);
 		scanner.useDelimiter(Pattern.compile("[\\n]"));
 		sQueries = new ArrayList<String>();
@@ -41,7 +44,6 @@ public class SqlReader {
 		int i=0;
 		while (scanner.hasNext()) {
 			String s = scanner.next();
-//			System.out.println("SCANNER: "+s);
 			if (s.startsWith("s:")) {
 				s = s.replaceAll("s:", "");
 				sQueries.add(s);
@@ -52,7 +54,7 @@ public class SqlReader {
 			} else if (s.startsWith("--")) {
 				// commentaire
 			} else {
-				log.severe("ERROR: the query file ("+file+") is malformed.");
+				log.severe("ERROR: the query file ("+statsFile+") is malformed.");
 				throw new MalformedInputException(3);
 			}
 		}
