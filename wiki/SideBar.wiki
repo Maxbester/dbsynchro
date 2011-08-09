@@ -1,4 +1,4 @@
-  * [MainPage DbSynchroTool overview]
+  * [MainPage Home page]
     * [MainPage#Introduction Introduction]
     * [MainPage#Requirements Requirements]
     * [MainPage#How_to_use_this_program? How to use this program?]
