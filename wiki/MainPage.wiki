@@ -1,5 +1,5 @@
 #summary DbSynchroTool details
-#labels Featured
+#labels Featured,Phase-Requirements
 #sidebar SideBar
 
 =Home page=
