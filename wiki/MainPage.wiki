@@ -1,8 +1,9 @@
+#summary A walkthrough of the library
 #sidebar TableOfContents
 
 =Home page=
 
-<wiki:toc max_depth="1" />
+<wiki:toc max_depth="2" />
 
 ==Introduction==
 
