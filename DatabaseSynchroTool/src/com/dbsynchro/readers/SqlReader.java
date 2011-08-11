@@ -1,3 +1,5 @@
+package com.dbsynchro.readers;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.nio.charset.MalformedInputException;
@@ -7,6 +9,8 @@ import java.util.Scanner;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import com.dbsynchro.Controler;
+import com.dbsynchro.util.Query;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 

@@ -1,3 +1,5 @@
+package com.dbsynchro.connection;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -5,6 +7,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Logger;
+
+import com.dbsynchro.Controler;
 
 /**
  * Defines the information about a database server and method to modify its content. 
@@ -33,7 +37,7 @@ public class Server {
 		log.setLevel(Controler.getLevel());
 	}
 
-    protected Connection connect() throws InstantiationException, IllegalAccessException, SQLException {
+    public Connection connect() throws InstantiationException, IllegalAccessException, SQLException {
     	if (connection == null) {
 	        log.finer("Connection to: "+this.url);
 	        log.finer("Trying to connect...");
