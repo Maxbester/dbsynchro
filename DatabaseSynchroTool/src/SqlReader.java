@@ -19,8 +19,8 @@ import com.google.common.collect.Multimap;
 public class SqlReader {
 	
 	private final File sqlFile;
-	private List<String> sQueries;
-	private Multimap<Integer, String> dQueries;
+	private List<Query> sQueries;
+	private Multimap<Integer, Query> dQueries;
 	private final Logger log = Logger.getLogger(SqlReader.class.getName());
 	
 	/**
@@ -37,36 +37,77 @@ public class SqlReader {
 
 		sqlFile = new File(statsFile);
 		Scanner scanner = new Scanner(sqlFile);
-		scanner.useDelimiter(Pattern.compile("[\\n]"));
-		sQueries = new ArrayList<String>();
+		scanner.useDelimiter(Pattern.compile(";"));
+		sQueries = new ArrayList<Query>();
 		dQueries = ArrayListMultimap.create();
 		
 		int i=0;
 		while (scanner.hasNext()) {
 			String s = scanner.next();
+			
+			// if there is a problem whit the scanner we continue
+			// (could change 3 to a higher value)
+			if (s.length() < 3) {
+				continue;
+			}
+			
+			// clean all lines
+			if (s.contains("\n")) {
+				s = s.replaceAll("\\n", " ");
+			}
+			// remove all spaces at the beginning of the scanner
+			while (s.startsWith(" ")) {
+				s = s.substring(1);
+			}
+			
+			// if the scanner is a source server
 			if (s.startsWith("s:")) {
-				s = s.replaceAll("s:", "");
-				sQueries.add(s);
-				i = sQueries.size();
+				i = source(i, s);
+			// if the scanner is a distant server
 			} else if (s.startsWith("d:")) {
-				s = s.replaceAll("d:", "");
-				dQueries.put(i-1, s);
+				distant(i, s);
+			// if the scanner is a comment
 			} else if (s.startsWith("--")) {
-				// commentaire
+				log.finest("COMMENT");
+				if (s.indexOf("s:") != -1) {
+					i = source(i, s.substring(s.indexOf("s:")));
+				} else if (s.indexOf("d:") != -1) {
+					distant(i, s.substring(s.indexOf("d:")));
+				}
+				else {
+					log.warning("WARNING: NOTHING");
+				}
 			} else {
-				log.severe("ERROR: the query file ("+statsFile+") is malformed.");
+				log.severe("ERROR: the query "+s+" in the file ("+statsFile+") is malformed.");
 				throw new MalformedInputException(3);
 			}
 		}
 		log.config("SQL file reading OK");
 	}
 	
+	private int source(int i, String s) {
+		s = s.replaceAll("s:", "");
+		String name = s.substring(0, s.indexOf(":"));
+		String q = s.substring(s.indexOf(name)+name.length()+1);
+		sQueries.add(new Query(name, q));
+		i = sQueries.size();
+		log.finest("SOURCE: name="+name+", query="+q);
+		return i;
+	}
+	
+	private void distant(int i, String s) {
+		s = s.replaceAll("d:", "");
+		String name = s.substring(0, s.indexOf(":"));
+		String q = s.substring(s.indexOf(name)+name.length()+1);
+		dQueries.put(i-1, new Query(name, q));
+		log.finest("DISTANT: name="+name+", query="+q);
+	}
 
 	/**
 	 * Returns the queries that will be executed on the distant database.
 	 * @return
 	 */
-	public Multimap<Integer, String> getdQueries() {
+	public Multimap<Integer, Query> getdQueries() {
 		return dQueries;
 	}
 
@@ -74,7 +115,7 @@ public class SqlReader {
 	 * Returns the queries that will be executed on the source database.
 	 * @return
 	 */
-	public List<String> getsQueries() {
+	public List<Query> getsQueries() {
 		return sQueries;
 	}
 }

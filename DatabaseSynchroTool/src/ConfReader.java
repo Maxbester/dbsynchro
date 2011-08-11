@@ -1,8 +1,8 @@
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.MalformedInputException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -23,9 +23,8 @@ import org.xml.sax.SAXException;
 public class ConfReader {
 	
 	private final File xml;
-	
-	private Server sourceServer;
-	private Server distantServer;
+
+	private List<Server> servers;
 	private Email email;
 	private final Logger log = Logger.getLogger(ConfReader.class.getName());
 	
@@ -50,10 +49,10 @@ public class ConfReader {
 		Document document = constructor.parse(xml);
 		
 		Element root = document.getDocumentElement();
-
-//		loggerReader(root, file);
 		
 		emailReader(root, file);
+		
+		servers = new ArrayList<Server>();
 
 		serversReader(root, file);
 		
@@ -68,30 +67,18 @@ public class ConfReader {
 	private void serversReader(Element root, String file) throws MalformedInputException {
 		// store server nodes
 		NodeList nodes = root.getElementsByTagName("server");
+
+		List<Element> servers;
 		
-		// the key represents the type of the server (source or target)
-		Map<String, Element> servers = new HashMap<String, Element>();
-		
-		if (nodes.getLength() != 2) {
-			log.severe("ERROR: Two servers must be specified in the configuration file: "+file+". One for the source and one for the target.");
+		if (nodes.getLength() < 2) {
+			log.severe("ERROR: At least two servers must be specified in the configuration file: "+file+". One for the source and one for the target.");
 			throw new MalformedInputException(-1);
 		}
 		
+		servers = new ArrayList<Element>();
+		
 		for (int i = 0 ; i < nodes.getLength() ; i++) {
-			servers.put(((Element) nodes.item(i)).getAttribute("type"), (Element) nodes.item(i));
-		}
-		
-		Element source = servers.get("source");
-		Element distant = servers.get("target");
-		
-		if (source == null) {
-			log.severe("ERROR: The source has not been specified in the configuration file: "+file+".");
-			throw new MalformedInputException(0);
-		}
-		
-		if (distant == null) {
-			log.severe("ERROR: The target has not been specified in the configuration file: "+file+".");
-			throw new MalformedInputException(0);
+			servers.add((Element) nodes.item(i));
 		}
 		
 		Element name;
@@ -100,35 +87,22 @@ public class ConfReader {
 		Element password;
 		Element driver;
 		
-		if (source.getElementsByTagName("name").getLength() != 1 || source.getElementsByTagName("url").getLength() != 1 ||
-				source.getElementsByTagName("login").getLength() != 1 || source.getElementsByTagName("password").getLength() != 1 ||
-				source.getElementsByTagName("driver").getLength() != 1) {
-			log.severe("ERROR: Have a look at the source in the configuration file: "+file+".");
-			throw new MalformedInputException(1);
-		}
-		
-		name = (Element) source.getElementsByTagName("name").item(0);
-		url = (Element) source.getElementsByTagName("url").item(0);
-		login = (Element) source.getElementsByTagName("login").item(0);
-		password = (Element) source.getElementsByTagName("password").item(0);
-		driver = (Element) source.getElementsByTagName("driver").item(0);
-		
-		sourceServer = new Server(name.getTextContent(), url.getTextContent(), login.getTextContent(), password.getTextContent(), driver.getTextContent());
-		
-		if (distant.getElementsByTagName("name").getLength() != 1 || distant.getElementsByTagName("url").getLength() != 1 ||
-				distant.getElementsByTagName("login").getLength() != 1 || distant.getElementsByTagName("password").getLength() != 1 ||
-				distant.getElementsByTagName("driver").getLength() != 1) {
-			log.severe("ERROR: Have a look at the target in the configuration file: "+file+".");
-			throw new MalformedInputException(1);
-		}
-		
-		name = (Element) distant.getElementsByTagName("name").item(0);
-		url = (Element) distant.getElementsByTagName("url").item(0);
-		login = (Element) distant.getElementsByTagName("login").item(0);
-		password = (Element) distant.getElementsByTagName("password").item(0);
-		driver = (Element) distant.getElementsByTagName("driver").item(0);
-		
-		distantServer = new Server(name.getTextContent(), url.getTextContent(), login.getTextContent(), password.getTextContent(), driver.getTextContent());		
+		for (Element serv : servers) {
+			if (serv.getElementsByTagName("name").getLength() != 1 || serv.getElementsByTagName("url").getLength() != 1 ||
+					serv.getElementsByTagName("login").getLength() != 1 || serv.getElementsByTagName("password").getLength() != 1 ||
+					serv.getElementsByTagName("driver").getLength() != 1) {
+				log.severe("ERROR: Have a look at the servers definition in the configuration file: "+file+".");
+				throw new MalformedInputException(1);
+			}
+			
+			name = (Element) serv.getElementsByTagName("name").item(0);
+			url = (Element) serv.getElementsByTagName("url").item(0);
+			login = (Element) serv.getElementsByTagName("login").item(0);
+			password = (Element) serv.getElementsByTagName("password").item(0);
+			driver = (Element) serv.getElementsByTagName("driver").item(0);
+			
+			this.servers.add(new Server(name.getTextContent(), url.getTextContent(), login.getTextContent(), password.getTextContent(), driver.getTextContent()));
+		}		
 	}
 
 	private void emailReader(Element root, String file) throws MalformedInputException {
@@ -169,46 +143,12 @@ public class ConfReader {
 		}
 	}
 
-	/*
-	private void loggerReader(Element root, String file) throws MalformedInputException {
-		NodeList nodes = root.getElementsByTagName("logger");
-		
-		if (nodes.getLength() > 1) {
-			this.log.severe("ERROR: Only one logger must be specified in the configuration file: "+file+".");
-			throw new MalformedInputException(0);
-		}
-		
-		// no logger
-		if (nodes.getLength() == 0) {
-			return;
-		}
-		
-		if (((Element) nodes.item(0)).getAttribute("level") == null) {
-			this.log.severe("ERROR: Have a look at the logger conf in the configuration file: "+file+".");
-			throw new MalformedInputException(1);
-		}
-		
-		this.level = Level.parse(((Element) nodes.item(0)).getAttribute("level").toUpperCase());
-
-		this.log.setLevel(level);
-		
-		System.out.println("log level: "+log.getLevel());
-	}*/
-	
 	/**
-	 * Return the source server information
+	 * Return a list of servers information
 	 * @return
 	 */
-	public Server getSourceServer() {
-		return sourceServer;
-	}
-
-	/**
-	 * Return the source server information
-	 * @return
-	 */
-	public Server getDistantServer() {
-		return distantServer;
+	public List<Server> getServers() {
+		return servers;
 	}
 	
 	/**

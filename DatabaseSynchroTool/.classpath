@@ -14,5 +14,6 @@
 			<attribute name="javadoc_location" value="http://javamail.kenai.com/nonav/javadocs/index.html?javax/mail/package-summary.html"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="lib/sqljdbc4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

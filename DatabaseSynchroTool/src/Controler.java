@@ -41,7 +41,7 @@ public class Controler {
 	public static void main(String[] args) {
 
 		try {
-			handler = new FileHandler("DbSynchro-%g.log", 80000000, 5, true);
+			handler = new FileHandler("DbSynchro-%g.log", 5242880, 5, true);
 
 			handler.setFormatter(new Formatter() {
 
@@ -70,57 +70,98 @@ public class Controler {
 		log.severe("------------------------- START Database Synchro Tool -------------------------");
 		
 		try {
-			test();
+			test1();
+//			test2();
 		} catch (MessagingException e1) {
 			e1.printStackTrace();
 			log.warning("EMAIL not sent: "+e1.getMessage());
 		}
 		log.severe("-- END of the program");
 	}
-
-	public static void test() throws MessagingException {
+	
+	public static void test2() throws MessagingException {
 		Email email = null;
 		
 		ConfReader cr = null;
 
-			// reading of the configuration
-			try {
-				cr = new ConfReader(configFile);
-			} catch (ParserConfigurationException e) {
-				e.printStackTrace();
-				log.severe("ERROR: "+e.getMessage());
-			} catch (IOException e) {
-				e.printStackTrace();
-				log.severe("ERROR: "+e.getMessage());
-			} catch (SAXException e) {
-				e.printStackTrace();
-				log.severe("ERROR: "+e.getMessage());
-			}
+		// reading of the configuration
+		try {
+			cr = new ConfReader(configFile);
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+			log.severe("ERROR: "+e.getMessage());
+		} catch (IOException e) {
+			e.printStackTrace();
+			log.severe("ERROR: "+e.getMessage());
+		} catch (SAXException e) {
+			e.printStackTrace();
+			log.severe("ERROR: "+e.getMessage());
+		}
 
-			log.config(cr.getSourceServer()+"\n");
+		log.config(cr.getServers().toString());
 
-			log.config(cr.getDistantServer().toString());
+		if (cr.isEmail()) {
+			email = cr.getEmail();
+			log.config(email.toString());
+		}
 
-			if (cr.isEmail()) {
-				email = cr.getEmail();
-				log.config(email.toString());
-			}
+		//reading of the statements
+		try {
+			new SqlReader(statsFile);
+		} catch (MalformedInputException e) {
+			e.printStackTrace();
+			log.severe("ERROR: "+e.getMessage());
+			if (email != null) 
+				email.send(e.toString());
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			log.severe("ERROR: "+e.getMessage());
+			if (email != null) 
+				email.send(e.toString());
+		}
+	}
 
-			//reading of the statements
-			SqlReader sr = null;
-			try {
-				sr = new SqlReader(statsFile);
-			} catch (MalformedInputException e) {
-				e.printStackTrace();
-				log.severe("ERROR: "+e.getMessage());
-				if (email != null) 
-					email.send(e.toString());
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-				log.severe("ERROR: "+e.getMessage());
-				if (email != null) 
-					email.send(e.toString());
-			}
+	public static void test1() throws MessagingException {
+		Email email = null;
+		
+		ConfReader cr = null;
+
+		// reading of the configuration
+		try {
+			cr = new ConfReader(configFile);
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+			log.severe("ERROR: "+e.getMessage());
+		} catch (IOException e) {
+			e.printStackTrace();
+			log.severe("ERROR: "+e.getMessage());
+		} catch (SAXException e) {
+			e.printStackTrace();
+			log.severe("ERROR: "+e.getMessage());
+		}
+
+		log.config(cr.getServers().toString());
+
+		if (cr.isEmail()) {
+			email = cr.getEmail();
+			log.config(email.toString());
+		}
+
+		//reading of the statements
+		SqlReader sr = null;
+		try {
+			sr = new SqlReader(statsFile);
+		} catch (MalformedInputException e) {
+			e.printStackTrace();
+			log.severe("ERROR: "+e.getMessage());
+			if (email != null) 
+				email.send(e.toString());
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			log.severe("ERROR: "+e.getMessage());
+			if (email != null) 
+				email.send(e.toString());
+		}
 
 			log.info("Number of local statements: "+sr.getsQueries().size());
 			log.config("Local statements: "+sr.getsQueries());
@@ -129,7 +170,7 @@ public class Controler {
 			log.config("Distant statements: "+sr.getdQueries());
 			
 			try {
-				new SqlRunner(sr.getsQueries(), sr.getdQueries(), cr.getSourceServer(), cr.getDistantServer());
+				new SqlRunner(sr.getsQueries(), sr.getdQueries(), cr.getServers());
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
 				log.severe("ERROR: "+e.getMessage());
