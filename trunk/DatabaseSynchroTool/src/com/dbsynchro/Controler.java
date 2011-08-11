@@ -1,3 +1,5 @@
+package com.dbsynchro;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.MalformedInputException;
@@ -15,6 +17,11 @@ import javax.mail.MessagingException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
+
+import com.dbsynchro.readers.ConfReader;
+import com.dbsynchro.readers.SqlReader;
+import com.dbsynchro.runners.SqlRunner;
+import com.dbsynchro.util.Email;
 
 /**
  * Runs the program.

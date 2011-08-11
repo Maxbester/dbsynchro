@@ -1,3 +1,4 @@
+package com.dbsynchro.util;
 
 public class Query {
 	private String statement;

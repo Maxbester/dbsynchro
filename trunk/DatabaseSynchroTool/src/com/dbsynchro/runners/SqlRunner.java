@@ -1,8 +1,13 @@
+package com.dbsynchro.runners;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.logging.Logger;
 
+import com.dbsynchro.Controler;
+import com.dbsynchro.connection.Server;
+import com.dbsynchro.util.Query;
 import com.google.common.collect.Multimap;
 
 /**
