@@ -1,29 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-http://www.khelll.com/blog/mysql/changing-database-encoding-from-latin-to-utf8/
-
 -->
 <config>
 	<email>
 		<smtp port="25">localhost</smtp>
-		<from>dbSynchro@speedcrete.co.uk</from>
+		<from>dbSynchro@bob.co.uk</from>
 		<subject>Synchronisation failed</subject>
-		<recipient>buisson@etud.insa-toulouse.fr</recipient>
+		<recipient>maxime.buisson1@gmail.com</recipient>
 	</email>
-	<server type="source">
-		<name>MS Server</name>
-		<!--<url>jdbc:sqlserver://localhost/test1</url>-->
-		<url>jdbc:mysql://localhost/test1</url>
+	<server>
+		<name>MS_Server</name>
+		<url>jdbc:mysql://192.168.0.1/test1</url>
 		<login>root</login>
-		<password>test</password>
+		<password>1234</password>
 		<driver>com.mysql.jdbc.Driver</driver>
 	</server>
-	<server type="target">
-		<name>Linux Web Server</name>
-		<url>jdbc:mysql://localhost/test2</url>
+	<server>
+		<name>RedHat_Server</name>
+		<url>jdbc:mysql://192.168.0.253/test2</url>
+		<login>1234</login>
+		<password>redcar</password>
+		<driver>com.mysql.jdbc.Driver</driver>
+	</server>
+	<server>
+		<name>Debian_Server</name>
+		<url>jdbc:mysql://192.168.23.1/test3</url>
 		<login>root</login>
-		<password>test</password>
+		<password>1234</password>
 		<driver>com.mysql.jdbc.Driver</driver>
 	</server>
 </config>

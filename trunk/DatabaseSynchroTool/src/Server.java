@@ -35,8 +35,8 @@ public class Server {
 
     protected Connection connect() throws InstantiationException, IllegalAccessException, SQLException {
     	if (connection == null) {
-	        log.config("Connection to: "+this.url);
-	        log.config("Trying to connect...");
+	        log.finer("Connection to: "+this.url);
+	        log.finer("Trying to connect...");
 	        try {
 				Class.forName(driver).newInstance();
 			} catch (ClassNotFoundException e) {
@@ -45,7 +45,7 @@ public class Server {
 			}
 			try {
 				connection = DriverManager.getConnection(url, login, password);
-				log.config("Connection established.");
+				log.finer("Connection established.");
 			}
 	        catch (SQLException e){
 	        	log.severe( "ERROR: Driver loaded, but cannot connect to db: "+e.getMessage());
@@ -152,6 +152,7 @@ public class Server {
 			rs.close();
 		}
 		connect().close();
-		log.config("Disconnected from: "+this.url);
+		log.finer("Disconnected from: "+this.url);
+		connection = null;
 	}
 }

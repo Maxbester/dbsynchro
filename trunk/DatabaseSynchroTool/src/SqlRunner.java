@@ -17,45 +17,84 @@ public class SqlRunner {
 	/**
 	 * Runs the input queries. The results are stocked in specific fields in the Server objects.
 	 * @param logger
-	 * @param source
-	 * @param distant
-	 * @param sourceServer
-	 * @param targetServer
+	 * @param list
+	 * @param multimap
+	 * @param servers
 	 * @throws ClassNotFoundException
 	 * @throws SQLException
 	 * @throws IllegalAccessException 
 	 * @throws InstantiationException 
 	 */
-	public SqlRunner(List<String> source, Multimap<Integer, String> distant, Server sourceServer, Server targetServer) throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException {
+	public SqlRunner(List<Query> sourceQueries, Multimap<Integer, Query> distantQueries, List<Server> servers) throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException {
 		log.addHandler(Controler.getHandler());
 		log.setLevel(Controler.getLevel());
 		log.info(" -- Run SQL statements");
-		
 		ResultSet sourceStatement;
-		sourceServer.connect();
-		targetServer.connect();
-
-		for (int i = 0 ; i < source.size() ; i++) {
-			sourceStatement = sourceServer.selectStatement(source.get(i));
-			log.fine("[source] : "+source.get(i));
-			while (sourceStatement.next()) {
-				for (String distantQuery : distant.get(i)) {
-					int open = 0;
-					int close = 0;
-					String temp = distantQuery;
-					while (temp.contains("[")) {
-						open = temp.indexOf("[");
-						close = temp.indexOf("]");
-						int column = Integer.parseInt(temp.substring(open+1, close));
-						distantQuery = distantQuery.replace(temp.substring(open, close+1), sourceStatement.getString(column));
-						temp = temp.substring(close+1);
-					}
-					log.fine("[distant] : "+distantQuery);
-					targetServer.simpleStatement(distantQuery);
+		// index of source queries
+		int i = 0;
+		
+		// for each source query
+		for (Query q : sourceQueries) {
+			Server sourceServer = null;
+			
+			// we select the good server in the list of servers
+			for (Server s : servers) {
+				if (s.getName().equalsIgnoreCase(q.getServerName())) {
+					sourceServer = s;
+					break;
 				}
 			}
+			
+			// if source server we picked up does not exist we go to the next source server
+			if (sourceServer == null)
+				continue;
+			
+			// we connect to the server database
+			sourceServer.connect();
+
+			// we run the statement
+			sourceStatement = sourceServer.selectStatement(q.getStatement());
+
+			log.fine("source statement: "+q.getStatement());
+
+			// we loop over the results of the statement
+			while (sourceStatement.next()) {
+				Server distantServer = null;
+				// for each distant query corresponding to the current source server (thanks to 'i')
+				for (Query distantQuery : distantQueries.get(i)) {
+					// we select the good server in the list of servers
+					for (Server s : servers) {
+						if (s.getName().equalsIgnoreCase(distantQuery.getServerName())) {
+							distantServer = s;
+							break;
+						}
+					}
+					log.fine("Affected rows: "+runDistantQuery(distantQuery.getStatement(), sourceStatement, distantServer));
+				}
+			}
+			sourceServer.disconnect();
+			i++;
 		}
-		targetServer.disconnect();
-		sourceServer.disconnect();
+	}
+	
+	private int runDistantQuery(String query, ResultSet sourceStatement, Server distantServer) throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+		log.fine("distant query: "+query);
+		int open = 0;
+		int close = 0;
+		String temp = query;
+		// we replace the square bracket by the good values
+		while (temp.contains("[")) {
+			open = temp.indexOf("[");
+			close = temp.indexOf("]");
+			int column = Integer.parseInt(temp.substring(open+1, close));
+			query = query.replace(temp.substring(open, close+1), sourceStatement.getString(column));
+			temp = temp.substring(close+1);
+		}
+
+		distantServer.connect();
+		close = distantServer.simpleStatement(query);
+		distantServer.disconnect();
+		// return number of affected rows.
+		return close;
 	}
 }
