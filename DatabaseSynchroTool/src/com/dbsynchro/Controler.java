@@ -39,7 +39,7 @@ public class Controler {
 	private static final Logger log = Logger.getLogger(Controler.class.getName());
 	
 	private static Handler handler;
-
+	
 	/**
 	 * The launcher of the program. You should run the program like: "java -jar DbSynchroTool.jar -c config.xml -s stats.sql"
 	 * @param args 
@@ -93,7 +93,7 @@ public class Controler {
 
 		// reading of the configuration
 		try {
-			cr = new ConfReader(configFile);
+			cr = new ConfReader(handler, configFile);
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
 			log.severe("ERROR: "+e.getMessage());
@@ -114,7 +114,7 @@ public class Controler {
 
 		//reading of the statements
 		try {
-			new SqlReader(statsFile);
+			new SqlReader(handler, statsFile);
 		} catch (MalformedInputException e) {
 			e.printStackTrace();
 			log.severe("ERROR: "+e.getMessage());
@@ -135,7 +135,7 @@ public class Controler {
 
 		// reading of the configuration
 		try {
-			cr = new ConfReader(configFile);
+			cr = new ConfReader(handler, configFile);
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
 			log.severe("ERROR: "+e.getMessage());
@@ -157,7 +157,7 @@ public class Controler {
 		//reading of the statements
 		SqlReader sr = null;
 		try {
-			sr = new SqlReader(statsFile);
+			sr = new SqlReader(handler, statsFile);
 		} catch (MalformedInputException e) {
 			e.printStackTrace();
 			log.severe("ERROR: "+e.getMessage());
@@ -177,7 +177,7 @@ public class Controler {
 			log.config("Distant statements: "+sr.getdQueries());
 			
 			try {
-				new SqlRunner(sr.getsQueries(), sr.getdQueries(), cr.getServers());
+				new SqlRunner(handler, sr.getsQueries(), sr.getdQueries(), cr.getServers());
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
 				log.severe("ERROR: "+e.getMessage());

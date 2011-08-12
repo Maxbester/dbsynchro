@@ -6,10 +6,10 @@ import java.nio.charset.MalformedInputException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.logging.Handler;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
-import com.dbsynchro.Controler;
 import com.dbsynchro.util.Query;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
@@ -34,9 +34,9 @@ public class SqlReader {
 	 * @throws FileNotFoundException
 	 * @throws MalformedInputException
 	 */
-	public SqlReader(String statsFile) throws FileNotFoundException, MalformedInputException {
-		log.addHandler(Controler.getHandler());
-		log.setLevel(Controler.getLevel());
+	public SqlReader(Handler logHandler, String statsFile) throws FileNotFoundException, MalformedInputException {
+		log.addHandler(logHandler);
+		log.setLevel(logHandler.getLevel());
 		log.info(" -- Reading of the statements ("+statsFile+")");
 
 		sqlFile = new File(statsFile);
@@ -86,7 +86,7 @@ public class SqlReader {
 				throw new MalformedInputException(3);
 			}
 		}
-		log.config("SQL file reading OK");
+		log.config(" -- SQL file reading OK");
 	}
 	
 	private int source(int i, String s) {
