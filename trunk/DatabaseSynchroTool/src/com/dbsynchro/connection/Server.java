@@ -6,9 +6,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.logging.Handler;
 import java.util.logging.Logger;
-
-import com.dbsynchro.Controler;
 
 /**
  * Defines the information about a database server and method to modify its content. 
@@ -27,20 +26,20 @@ public class Server {
 	private ResultSet rs;
 	private final Logger log = Logger.getLogger(Server.class.getName());
 
-	public Server(String name, String url, String login, String password, String driver) {
+	public Server(Handler logHandler, String name, String url, String login, String password, String driver) {
 		this.name = name;
 		this.url = url;
 		this.login = login;
 		this.password = password;
 		this.driver = driver;
-		log.addHandler(Controler.getHandler());
-		log.setLevel(Controler.getLevel());
+		log.addHandler(logHandler);
+		log.setLevel(logHandler.getLevel());
 	}
 
     public Connection connect() throws InstantiationException, IllegalAccessException, SQLException {
     	if (connection == null) {
-	        log.finer("Connection to: "+this.url);
-	        log.finer("Trying to connect...");
+	        log.finest("Connection to: "+this.url);
+	        log.finest("Trying to connect...");
 	        try {
 				Class.forName(driver).newInstance();
 			} catch (ClassNotFoundException e) {
@@ -49,7 +48,7 @@ public class Server {
 			}
 			try {
 				connection = DriverManager.getConnection(url, login, password);
-				log.finer("Connection established.");
+				log.finest("Connection established.");
 			}
 	        catch (SQLException e){
 	        	log.severe( "ERROR: Driver loaded, but cannot connect to db: "+e.getMessage());

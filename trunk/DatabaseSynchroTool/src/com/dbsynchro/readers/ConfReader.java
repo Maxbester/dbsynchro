@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.charset.MalformedInputException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Handler;
 import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -16,7 +17,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import com.dbsynchro.Controler;
 import com.dbsynchro.connection.Server;
 import com.dbsynchro.util.Email;
 
@@ -33,6 +33,7 @@ public class ConfReader {
 	private List<Server> servers;
 	private Email email;
 	private final Logger log = Logger.getLogger(ConfReader.class.getName());
+	private Handler logHandler;
 	
 	/**
 	 * Loads config.xml, parses it and create the sourceServer and the distantServer
@@ -42,9 +43,10 @@ public class ConfReader {
 	 * @throws IOException
 	 * @throws SAXException
 	 */
-	public ConfReader (String file) throws ParserConfigurationException, IOException, SAXException {
-		log.addHandler(Controler.getHandler());
-		log.setLevel(Controler.getLevel());
+	public ConfReader (Handler logHandler, String file) throws ParserConfigurationException, IOException, SAXException {
+		log.addHandler(logHandler);
+		log.setLevel(logHandler.getLevel());
+		this.logHandler = logHandler;
 
 		log.info(" -- Reading of the configuration ("+file+")");
 		
@@ -62,7 +64,7 @@ public class ConfReader {
 
 		serversReader(root, file);
 		
-		this.log.config("Config file reading OK");
+		this.log.config(" -- Config file reading OK");
 	}
 	
 	/**
@@ -107,7 +109,7 @@ public class ConfReader {
 			password = (Element) serv.getElementsByTagName("password").item(0);
 			driver = (Element) serv.getElementsByTagName("driver").item(0);
 			
-			this.servers.add(new Server(name.getTextContent(), url.getTextContent(), login.getTextContent(), password.getTextContent(), driver.getTextContent()));
+			this.servers.add(new Server(logHandler, name.getTextContent(), url.getTextContent(), login.getTextContent(), password.getTextContent(), driver.getTextContent()));
 		}		
 	}
 
@@ -137,7 +139,7 @@ public class ConfReader {
 		String port = smtp.getAttribute("port");
 		Element subject = (Element) email.getElementsByTagName("subject").item(0);
 		
-		this.email = new Email(from.getTextContent(), smtp.getTextContent(), port, subject.getTextContent());
+		this.email = new Email(logHandler, from.getTextContent(), smtp.getTextContent(), port, subject.getTextContent());
 
 		if (email.getElementsByTagName("recipient") != null) {
 			for (int i = 0 ; i < email.getElementsByTagName("recipient").getLength() ; i++) {

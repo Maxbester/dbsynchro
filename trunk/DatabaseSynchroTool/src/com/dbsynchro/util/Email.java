@@ -3,6 +3,7 @@ package com.dbsynchro.util;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
+import java.util.logging.Handler;
 import java.util.logging.Logger;
 
 import javax.mail.Message;
@@ -11,8 +12,6 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-
-import com.dbsynchro.Controler;
 
 /**
  * 
@@ -28,14 +27,14 @@ public class Email {
 	private Set<String> recipients;
 	private final Logger log = Logger.getLogger(Email.class.getName());
 
-	public Email(String from, String smtp, String port, String subject) {
+	public Email(Handler handler, String from, String smtp, String port, String subject) {
 		this.from = from;
 		this.smtp = smtp;
 		this.port = port;
 		this.subject = subject;
 		this.recipients = new HashSet<String>();
-		log.addHandler(Controler.getHandler());
-		log.setLevel(Controler.getLevel());
+		log.addHandler(handler);
+		log.setLevel(handler.getLevel());
 	}
 
 	public String getFrom() {

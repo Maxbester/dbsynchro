@@ -3,9 +3,9 @@ package com.dbsynchro.runners;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.logging.Handler;
 import java.util.logging.Logger;
 
-import com.dbsynchro.Controler;
 import com.dbsynchro.connection.Server;
 import com.dbsynchro.util.Query;
 import com.google.common.collect.Multimap;
@@ -30,9 +30,9 @@ public class SqlRunner {
 	 * @throws IllegalAccessException 
 	 * @throws InstantiationException 
 	 */
-	public SqlRunner(List<Query> sourceQueries, Multimap<Integer, Query> distantQueries, List<Server> servers) throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException {
-		log.addHandler(Controler.getHandler());
-		log.setLevel(Controler.getLevel());
+	public SqlRunner(Handler logHandler, List<Query> sourceQueries, Multimap<Integer, Query> distantQueries, List<Server> servers) throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException {
+		log.addHandler(logHandler);
+		log.setLevel(logHandler.getLevel());
 		log.info(" -- Run SQL statements");
 		ResultSet sourceStatement;
 		// index of source queries
@@ -60,7 +60,7 @@ public class SqlRunner {
 			// we run the statement
 			sourceStatement = sourceServer.selectStatement(q.getStatement());
 
-			log.fine("source statement: "+q.getStatement());
+			log.config("Source query: "+q.getStatement());
 
 			// we loop over the results of the statement
 			while (sourceStatement.next()) {
@@ -74,16 +74,16 @@ public class SqlRunner {
 							break;
 						}
 					}
-					log.fine("Affected rows: "+runDistantQuery(distantQuery.getStatement(), sourceStatement, distantServer));
+					log.config("Affected rows: "+runDistantQuery(distantQuery.getStatement(), sourceStatement, distantServer));
 				}
 			}
 			sourceServer.disconnect();
 			i++;
 		}
+		log.info("Queries executed successfuly.");
 	}
 	
 	private int runDistantQuery(String query, ResultSet sourceStatement, Server distantServer) throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
-		log.fine("distant query: "+query);
 		int open = 0;
 		int close = 0;
 		String temp = query;
@@ -97,6 +97,7 @@ public class SqlRunner {
 		}
 
 		distantServer.connect();
+		log.config("Distant query: "+query);
 		close = distantServer.simpleStatement(query);
 		distantServer.disconnect();
 		// return number of affected rows.
