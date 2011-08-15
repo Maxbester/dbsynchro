@@ -3,6 +3,7 @@
   * [MainPage#Requirements Requirements]
   * [MainPage#How_to_use_this_program? How to use this program?]
   * [MainPage#Libraries Libraries]
+ * [GraphicalVersion Friendly interface version]
  * [Downloads Downloads]
   * [Downloads#Version_1.2 Version 1.2]
   * [Downloads#Version_1.1 Version 1.1]
