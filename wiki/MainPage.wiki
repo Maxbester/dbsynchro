@@ -50,5 +50,6 @@ Database Synchro Tool uses:
   * [http://kenai.com/projects/javamail JavaMail]
   * [http://www.mysql.com/downloads/connector/j/ MySQL Connector]
   * [http://msdn.microsoft.com/en-us/sqlserver/aa937724 Microsoft JDBC Driver for SQL Server]
+  * [http://en.wikipedia.org/wiki/Swing_%28Java%29 Swing for the graphical version]
 
 ====_If you like this software you can visit my professional website: [http://etud.insa-toulouse.fr/~buisson/ here]._====
