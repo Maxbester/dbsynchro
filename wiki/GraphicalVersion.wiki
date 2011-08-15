@@ -1,0 +1,5 @@
+#summary Friendly user interface
+
+= DbSycnhro Graphical User Interface =
+
+This version of the program includes a friendly graphical version.
