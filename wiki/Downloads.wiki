@@ -5,7 +5,7 @@
 == Graphical Version ==
 Same functionalities as the previous version but include a friendly user interface.
 You can download this software here:
- * [http://code.google.com/p/dbsynchro/downloads/detail?name=DbSyncrhoGui-1.0.jar GUI software]
+ * [http://code.google.com/p/dbsynchro/downloads/detail?name=DbSynchroGui-1.0.jar&can=2&q= GUI software]
 
 
 == Version 1.2 ==
