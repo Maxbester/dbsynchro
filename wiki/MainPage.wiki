@@ -38,6 +38,11 @@ java -jar DbSynchro-X.X.jar --config config.xml --queries queries.sql --logger C
 java -jar DbSynchro-X.X.jar -c config.xml -q queries.sql
 }}}
 
+*OR*
+
+
+[http://etud.insa-toulouse.fr/~buisson/TEMP/run.png http://etud.insa-toulouse.fr/~buisson/TEMP/run.png]
+
 ==Libraries==
 
 Database Synchro Tool uses:
