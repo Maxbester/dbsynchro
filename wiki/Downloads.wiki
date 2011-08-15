@@ -4,9 +4,10 @@
 
 
 == Version 1.2 ==
-All the program has been update. Now it offers the possibility to specify various sources and various targets.
+All the program has been updated. Now it offers the possibility to specify various sources and targets.
 
 You can have a look at both config.xml and statements.sql to see how it works.
+
 You can download the jar file and the associated files below. Choose your archive format.
   * [http://code.google.com/p/dbsynchro/downloads/detail?name=DbSyncrho-1.2.tar.gz&can=2&q= .tar.gz]
   * [http://code.google.com/p/dbsynchro/downloads/detail?name=DbSynchro-1.2.zip&can=2&q= .zip]
