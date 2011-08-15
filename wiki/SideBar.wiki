@@ -8,6 +8,7 @@
   * [GraphicalVersion#Queries_window Queries window]
   * [GraphicalVersion#Run Run]
  * [Downloads Downloads]
+  * [Downloads#Graphical_Version Graphical Version]
   * [Downloads#Version_1.2 Version 1.2]
   * [Downloads#Version_1.1 Version 1.1]
   * [Downloads#Version_1.0 Version 1.0]
