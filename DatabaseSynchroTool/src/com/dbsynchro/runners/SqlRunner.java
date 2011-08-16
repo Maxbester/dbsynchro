@@ -62,12 +62,28 @@ public class SqlRunner {
 			
 			log.config(sourceServer.getName()+": "+q.getStatement().replaceAll("[\t\n\r]", " "));
 
-			// we loop over the results of the statement
+			// we connect to the server database
 			try {
-				// we connect to the server database
 				sourceServer.connect();
+			} catch (SQLException e) {
+				log.severe("ERROR: Cannot connect to a server: "+e.getMessage());
+				e.printStackTrace();
+				emailContent += "ERROR: Cannot connect to a server: "+e.getMessage()+"\n";
+				continue;
+			}
+			
+			try {
 				// we run the statement
 				sourceStatement = sourceServer.selectStatement(q.getStatement());
+			} catch (SQLException e) {
+				log.severe("ERROR: Cannot run statement: "+e.getMessage());
+				e.printStackTrace();
+				emailContent += "ERROR: Cannot run statement: "+e.getMessage()+"\n";
+				continue;
+			}
+			
+			try {
+				// we loop over the results of the statement
 				while (sourceStatement.next()) {
 					Server distantServer = null;
 					// for each distant query corresponding to the current source server (thanks to 'i')
@@ -115,6 +131,13 @@ public class SqlRunner {
 					query = query.replace(temp.substring(open, close+1), sourceStatement.getString(column));
 				temp = temp.substring(close+1);
 			}
+		} catch (SQLException e) {
+			log.severe("ERROR: "+e.getMessage());
+			e.printStackTrace();
+			emailContent += "ERROR: "+e.getMessage()+"\n";
+		}
+
+		try {
 			distantServer.connect();
 			close = distantServer.simpleStatement(query);
 			log.config(distantServer.getName()+": "+query.replaceAll("[\t\n\r]", " "));
