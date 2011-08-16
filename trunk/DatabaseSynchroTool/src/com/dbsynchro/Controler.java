@@ -2,8 +2,8 @@ package com.dbsynchro;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.charset.MalformedInputException;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.FileHandler;
@@ -48,15 +48,16 @@ public class Controler {
 	public static void main(String[] args) {
 
 		try {
-			handler = new FileHandler("DbSynchro-%g.log", 5242880, 5, true);
+			// turn over 3Mb (5 files max)
+			handler = new FileHandler("DbSynchro-%g.log", 3145728, 5, true);
 
 			handler.setFormatter(new Formatter() {
 
-				private SimpleDateFormat format	= new SimpleDateFormat("dd-MMM-yyyy HH:mm:SSS");
+				private SimpleDateFormat format	= new SimpleDateFormat("dd/MM/yy HH:mm:SS");
 
 				@Override
 				public String format(LogRecord record) {
-					return "[" + format.format(new Date(record.getMillis())) + "] [" + record.getLoggerName() + "] "
+					return "[" + format.format(new Date(record.getMillis())) + "][" + record.getLoggerName() + "] "
 							+ record.getMessage() + "\n";
 				}
 			});
@@ -97,6 +98,9 @@ public class Controler {
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
 			log.severe("ERROR: "+e.getMessage());
+		} catch (ParseException e) {
+			e.printStackTrace();
+			log.severe("ERROR: "+e.getMessage());
 		} catch (IOException e) {
 			e.printStackTrace();
 			log.severe("ERROR: "+e.getMessage());
@@ -115,7 +119,7 @@ public class Controler {
 		//reading of the statements
 		try {
 			new SqlReader(handler, statsFile);
-		} catch (MalformedInputException e) {
+		} catch (ParseException e) {
 			e.printStackTrace();
 			log.severe("ERROR: "+e.getMessage());
 			if (email != null) 
@@ -139,6 +143,9 @@ public class Controler {
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
 			log.severe("ERROR: "+e.getMessage());
+		} catch (ParseException e) {
+			e.printStackTrace();
+			log.severe("ERROR: "+e.getMessage());
 		} catch (IOException e) {
 			e.printStackTrace();
 			log.severe("ERROR: "+e.getMessage());
@@ -158,7 +165,7 @@ public class Controler {
 		SqlReader sr = null;
 		try {
 			sr = new SqlReader(handler, statsFile);
-		} catch (MalformedInputException e) {
+		} catch (ParseException e) {
 			e.printStackTrace();
 			log.severe("ERROR: "+e.getMessage());
 			if (email != null) 
@@ -171,10 +178,8 @@ public class Controler {
 		}
 
 			log.info("Number of local statements: "+sr.getsQueries().size());
-			log.config("Local statements: "+sr.getsQueries());
 
 			log.info("Number of distant statements: "+sr.getdQueries().size());
-			log.config("Distant statements: "+sr.getdQueries());
 			
 			try {
 				new SqlRunner(handler, sr.getsQueries(), sr.getdQueries(), cr.getServers());

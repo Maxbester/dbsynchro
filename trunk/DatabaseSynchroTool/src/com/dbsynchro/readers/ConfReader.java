@@ -2,7 +2,7 @@ package com.dbsynchro.readers;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.MalformedInputException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Handler;
@@ -32,7 +32,7 @@ public class ConfReader {
 
 	private List<Server> servers;
 	private Email email;
-	private final Logger log = Logger.getLogger(ConfReader.class.getName());
+	private final Logger log = Logger.getLogger("ConfReader");
 	private Handler logHandler;
 	
 	/**
@@ -42,8 +42,10 @@ public class ConfReader {
 	 * @throws ParserConfigurationException
 	 * @throws IOException
 	 * @throws SAXException
+	 * @throws ParseException 
+	 * @throws IOException 
 	 */
-	public ConfReader (Handler logHandler, String file) throws ParserConfigurationException, IOException, SAXException {
+	public ConfReader (Handler logHandler, String file) throws ParserConfigurationException, SAXException, ParseException, IOException {
 		log.addHandler(logHandler);
 		log.setLevel(logHandler.getLevel());
 		this.logHandler = logHandler;
@@ -71,8 +73,9 @@ public class ConfReader {
 	 * This method is in charge with collecting all information referring to the servers.
 	 * @param root The root Element
 	 * @throws MalformedInputException Thrown when the config file is mal formed.
+	 * @throws ParseException 
 	 */
-	private void serversReader(Element root, String file) throws MalformedInputException {
+	private void serversReader(Element root, String file) throws ParseException {
 		// store server nodes
 		NodeList nodes = root.getElementsByTagName("server");
 
@@ -80,7 +83,7 @@ public class ConfReader {
 		
 		if (nodes.getLength() < 2) {
 			log.severe("ERROR: At least two servers must be specified in the configuration file: "+file+". One for the source and one for the target.");
-			throw new MalformedInputException(-1);
+			throw new ParseException("ERROR: At least two servers must be specified in the configuration file: "+file+". One for the source and one for the target.", 0);
 		}
 		
 		servers = new ArrayList<Element>();
@@ -100,7 +103,7 @@ public class ConfReader {
 					serv.getElementsByTagName("login").getLength() != 1 || serv.getElementsByTagName("password").getLength() != 1 ||
 					serv.getElementsByTagName("driver").getLength() != 1) {
 				log.severe("ERROR: Have a look at the servers definition in the configuration file: "+file+".");
-				throw new MalformedInputException(1);
+				throw new ParseException("ERROR: Have a look at the servers definition in the configuration file: "+file+".", 0);
 			}
 			
 			name = (Element) serv.getElementsByTagName("name").item(0);
@@ -113,12 +116,12 @@ public class ConfReader {
 		}		
 	}
 
-	private void emailReader(Element root, String file) throws MalformedInputException {
+	private void emailReader(Element root, String file) throws ParseException {
 		NodeList nodes = root.getElementsByTagName("email");
 		
 		if (nodes.getLength() > 1) {
 			log.severe("ERROR: Only one email must be specified in the configuration file: "+file+".");
-			throw new MalformedInputException(0);
+			throw new ParseException("ERROR: Only one email must be specified in the configuration file: "+file+".", 0);
 		}
 		
 		// no email
@@ -131,7 +134,7 @@ public class ConfReader {
 		if (email.getElementsByTagName("from").getLength() != 1 || email.getElementsByTagName("smtp").getLength() != 1 ||
 				 email.getElementsByTagName("subject").getLength() != 1) {
 			log.severe("ERROR: Have a look at the email conf in the configuration file: "+file+".");
-			throw new MalformedInputException(1);
+			throw new ParseException("ERROR: Have a look at the email conf in the configuration file: "+file+".", 0);
 		}
 		
 		Element from = (Element) email.getElementsByTagName("from").item(0);
