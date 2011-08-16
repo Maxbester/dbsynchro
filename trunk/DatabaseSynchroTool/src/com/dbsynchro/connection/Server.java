@@ -36,25 +36,32 @@ public class Server {
 		log.setLevel(logHandler.getLevel());
 	}
 
-    public Connection connect() throws InstantiationException, IllegalAccessException, SQLException {
+    public Connection connect() throws SQLException {
     	if (connection == null) {
 	        log.finest("Connection to: "+this.url);
 	        log.finest("Trying to connect...");
 	        try {
 				Class.forName(driver).newInstance();
+				try {
+					connection = DriverManager.getConnection(url, login, password);
+					log.finest("Connection established.");
+				}
+		        catch (SQLException e){
+//		        	log.severe("ERROR: Driver loaded, but cannot connect to db: "+e.getMessage());
+		        	log.warning("/!\\ Connection NOT established. /!\\");
+//		        	throw new SQLException("ERROR: Can not connect to the database: "+e.getMessage());
+		        	throw new SQLException(e);
+		         }
 			} catch (ClassNotFoundException e) {
 				log.severe("ERROR: Can not find the driver: "+e.getMessage());
 				e.printStackTrace();
+			} catch (InstantiationException e) {
+				log.severe("ERROR: Problem the driver: "+e.getMessage());
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				log.severe("ERROR: Problem the driver: "+e.getMessage());
+				e.printStackTrace();
 			}
-			try {
-				connection = DriverManager.getConnection(url, login, password);
-				log.finest("Connection established.");
-			}
-	        catch (SQLException e){
-	        	log.severe( "ERROR: Driver loaded, but cannot connect to db: "+e.getMessage());
-	        	log.warning("/!\\ Connection NOT established. /!\\");
-	        	throw new SQLException();
-	         }
     	}
         return connection;
     }
@@ -68,13 +75,17 @@ public class Server {
      * @throws ClassNotFoundException
      * @throws IllegalAccessException 
      * @throws InstantiationException 
+     * @throws SQLException 
      */
-    public int simpleStatement (String statement) throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+    public int simpleStatement (String statement) throws SQLException {
     	if (statement == null)
     		return 0;
-        PreparedStatement insert = connect().prepareStatement(statement);
-        int res = insert.executeUpdate();
+    	int res = 0;
+        PreparedStatement insert;
+		insert = connect().prepareStatement(statement);
+        res = insert.executeUpdate();
         insert.close();
+
         return res;
     }
     
@@ -86,10 +97,12 @@ public class Server {
      * @throws ClassNotFoundException 
      * @throws IllegalAccessException 
      * @throws InstantiationException 
+     * @throws SQLException 
+     * @throws SQLException 
      */
-    public ResultSet selectStatement (String statement) throws ClassNotFoundException, SQLException, InstantiationException, IllegalAccessException {
-        Statement stat = connect().createStatement();
-        rs = stat.executeQuery(statement);
+    public ResultSet selectStatement (String statement) throws SQLException {
+    	Statement stat = connect().createStatement();
+		rs = stat.executeQuery(statement);
         return rs;
     }
 
@@ -150,12 +163,17 @@ public class Server {
 	}
 
 	
-	public void disconnect() throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
-		if (rs != null) {
-			rs.close();
+	public void disconnect() {
+		try {
+			if (rs != null) {
+				rs.close();
+			}
+			connect().close();
+			log.finer("Disconnected from: "+this.url);
+			connection = null;
+		} catch (SQLException e) {
+			log.severe("ERROR: "+e.getMessage());
+			e.printStackTrace();
 		}
-		connect().close();
-		log.finer("Disconnected from: "+this.url);
-		connection = null;
 	}
 }
