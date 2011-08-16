@@ -20,4 +20,9 @@ public class Query {
 	public void setStatement(String q) {
 		statement = q;
 	}
+	
+	@Override
+	public String toString() {
+		return serverName + " - " + statement;
+	}
 }

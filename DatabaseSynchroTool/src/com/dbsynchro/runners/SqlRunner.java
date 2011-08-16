@@ -17,7 +17,7 @@ import com.google.common.collect.Multimap;
  */
 public class SqlRunner {
 	
-	private final Logger log = Logger.getLogger(SqlRunner.class.getName());
+	private final Logger log = Logger.getLogger("SqlRunner");
 
 	/**
 	 * Runs the input queries. The results are stocked in specific fields in the Server objects.
@@ -37,7 +37,7 @@ public class SqlRunner {
 		ResultSet sourceStatement;
 		// index of source queries
 		int i = 0;
-		
+
 		// for each source query
 		for (Query q : sourceQueries) {
 			Server sourceServer = null;
@@ -48,19 +48,21 @@ public class SqlRunner {
 					sourceServer = s;
 					break;
 				}
-			}
+			}			
 			
 			// if source server we picked up does not exist we go to the next source server
-			if (sourceServer == null)
+			if (sourceServer == null) {
+				log.info("This source server does not exist.");
 				continue;
+			}
 			
+			log.config(sourceServer.getName()+": "+q.getStatement().replaceAll("[\t\n\r]", " "));
+
 			// we connect to the server database
 			sourceServer.connect();
 
 			// we run the statement
 			sourceStatement = sourceServer.selectStatement(q.getStatement());
-
-			log.config("Source query: "+q.getStatement());
 
 			// we loop over the results of the statement
 			while (sourceStatement.next()) {
@@ -80,7 +82,7 @@ public class SqlRunner {
 			sourceServer.disconnect();
 			i++;
 		}
-		log.info("Queries executed successfuly.");
+		log.info("End of queries execution.");
 	}
 	
 	private int runDistantQuery(String query, ResultSet sourceStatement, Server distantServer) throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
@@ -97,8 +99,8 @@ public class SqlRunner {
 		}
 
 		distantServer.connect();
-		log.config("Distant query: "+query);
 		close = distantServer.simpleStatement(query);
+		log.config(distantServer.getName()+": "+query.replaceAll("[\t\n\r]", " "));
 		distantServer.disconnect();
 		// return number of affected rows.
 		return close;
