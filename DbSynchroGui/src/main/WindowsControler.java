@@ -4,8 +4,8 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.charset.MalformedInputException;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -51,6 +51,7 @@ public class WindowsControler implements Runnable, Observer {
 
 	
 	public WindowsControler() {
+		Thread thisThread = Thread.currentThread();
 		try {
 			handler = new FileHandler("DbSynchro.log", false);
 
@@ -66,8 +67,10 @@ public class WindowsControler implements Runnable, Observer {
 			});
 		} catch (SecurityException e2) {
 			e2.printStackTrace();
+			thisThread.interrupt();
 		} catch (IOException e2) {
 			e2.printStackTrace();
+			thisThread.interrupt();
 		}
 		launcher = new Launcher(title);
 		observables = new HashMap<Observable,Object>();
@@ -130,6 +133,7 @@ public class WindowsControler implements Runnable, Observer {
                 else if(object.getKey() instanceof Runner) {
                 	if (object.getValue() instanceof ActionEvent) {
                 		sqlRunner();
+                		JOptionPane.showMessageDialog(null, "Queries were executed successfully.", "Done", JOptionPane.INFORMATION_MESSAGE);
                 	}
                 }
                 synchronized (this) {
@@ -140,50 +144,67 @@ public class WindowsControler implements Runnable, Observer {
 	}
 	
 	private void confReader() {
+		Thread thisThread = Thread.currentThread();
 		try {
 			cr = new ConfReader(handler, configFile.getCanonicalPath());
 		} catch (ParserConfigurationException e) {
 			JOptionPane.showMessageDialog(null, e.getMessage(), "Error in the configuration file", JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
+			thisThread.interrupt();
+		} catch (ParseException e) {
+			JOptionPane.showMessageDialog(null, e.getMessage(), "Error in the configuration file", JOptionPane.ERROR_MESSAGE);
+			e.printStackTrace();
+			thisThread.interrupt();
 		} catch (IOException e) {
 			JOptionPane.showMessageDialog(null, e.getMessage(), "Error in the configuration file", JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
+			thisThread.interrupt();
 		} catch (SAXException e) {
 			JOptionPane.showMessageDialog(null, e.getMessage(), "Error in the configuration file", JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
+			thisThread.interrupt();
 		}
 	}
 	
 	private void sqlReader() {
+		Thread thisThread = Thread.currentThread();
 		try {
 			sr = new SqlReader(handler, queriesFile.getCanonicalPath());
-		} catch (MalformedInputException e) {
+		} catch (ParseException e) {
 			JOptionPane.showMessageDialog(null, e.getMessage(), "Error in the statements file", JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
+			thisThread.interrupt();
 		} catch (FileNotFoundException e) {
 			JOptionPane.showMessageDialog(null, e.getMessage(), "Error in the statements file", JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
+			thisThread.interrupt();
 		} catch (IOException e) {
 			JOptionPane.showMessageDialog(null, e.getMessage(), "Error in the statements file", JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
+			thisThread.interrupt();
 		}
 	}
 	
 	private void sqlRunner() {
+		Thread thisThread = Thread.currentThread();
 		try {
 			new SqlRunner(handler, sr.getsQueries(), sr.getdQueries(), cr.getServers());
 		} catch (ClassNotFoundException e) {
 			JOptionPane.showMessageDialog(null, e.getMessage(), "Error while running SQL statements", JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
+			thisThread.interrupt();
 		} catch (SQLException e) {
 			JOptionPane.showMessageDialog(null, e.getMessage(), "Error while running SQL statements", JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
+			thisThread.interrupt();
 		} catch (InstantiationException e) {
 			JOptionPane.showMessageDialog(null, e.getMessage(), "Error while running SQL statements", JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
+			thisThread.interrupt();
 		} catch (IllegalAccessException e) {
 			JOptionPane.showMessageDialog(null, e.getMessage(), "Error while running SQL statements", JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
+			thisThread.interrupt();
 		}
 	}
 
