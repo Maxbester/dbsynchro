@@ -37,6 +37,7 @@ public class Runner extends JFrame implements WindowListener, Observable {
 	public Runner(String title, SqlReader sr) {
 		addWindowListener(this);
 
+		setLocationRelativeTo(null);
 		setTitle(title);
 		setBounds(100, 100, 800, 300);
 		contentPane = new JPanel();
@@ -82,8 +83,11 @@ public class Runner extends JFrame implements WindowListener, Observable {
 	@Override
 	public void windowClosing(WindowEvent e) {
 		int res = JOptionPane.showConfirmDialog(null, "Are you sure you want to quit?", "Close program", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-		if (res == 0)
-			setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		if (res == 0) {
+			controler.quit(0);
+//			setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//			notifyObservers(JFrame.EXIT_ON_CLOSE);
+		}
 		else
 			setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 	}
