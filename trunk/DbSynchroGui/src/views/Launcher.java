@@ -245,7 +245,7 @@ public class Launcher extends JFrame implements Observable, WindowListener {
 
 	@Override
 	public void windowClosing(WindowEvent e) {
-		int res = JOptionPane.showConfirmDialog(null, "Are you sure you want to quit? All operations will be stopped.", "Close program", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+		int res = JOptionPane.showConfirmDialog(null, "Are you sure you want to quit?", "Close program", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
 		if (res == 0) {
 			controler.quit(0);
 //			setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
