@@ -4,7 +4,6 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -23,6 +22,7 @@ import org.xml.sax.SAXException;
 
 import tools.Tools;
 import views.Runner;
+import views.Process;
 
 import com.dbsynchro.readers.ConfReader;
 import com.dbsynchro.readers.SqlReader;
@@ -33,7 +33,7 @@ import views.Launcher;
 import interfaces.Observable;
 import interfaces.Observer;
 
-public class WindowsControler implements Runnable, Observer {
+public class WindowsControler extends Thread implements Observer {
 	
 	private ConfReader cr;
 	private SqlReader sr;
@@ -79,8 +79,7 @@ public class WindowsControler implements Runnable, Observer {
 	
 	
 	public static void main(String[] args) {
-		WindowsControler wc = new WindowsControler();
-		wc.run();
+		new WindowsControler().run();
 	}
 	
 	public void update(Observable arg0, Object arg1) {
@@ -121,6 +120,11 @@ public class WindowsControler implements Runnable, Observer {
                 	}
                 	else if (object.getValue() instanceof Level) {
                 		handler.setLevel((Level)object.getValue());
+                	} else if (object.getValue() instanceof Integer) {
+                		if (((Integer)object.getValue()) == 3) {
+                			System.out.println("Close launcher");
+                			System.exit(0);
+                		}
                 	}
                 	// if both queries and config files are known we don't need the launcher anymore
                 	if (queriesFile != null && configFile != null) {
@@ -132,8 +136,20 @@ public class WindowsControler implements Runnable, Observer {
                 }
                 else if(object.getKey() instanceof Runner) {
                 	if (object.getValue() instanceof ActionEvent) {
-                		sqlRunner();
-                		JOptionPane.showMessageDialog(null, "Queries were executed successfully.", "Done", JOptionPane.INFORMATION_MESSAGE);
+                		Process p = new Process("Running queries","Please wait...");
+                		p.setVisible(true);
+                		if (sqlRunner() > 5) {
+                			p.dispose();
+                			JOptionPane.showMessageDialog(null, "Queries were executed with some problems.", "Warning", JOptionPane.WARNING_MESSAGE);
+                		} else {
+                			p.dispose();
+                			JOptionPane.showMessageDialog(null, "Queries were executed successfully.", "Done", JOptionPane.INFORMATION_MESSAGE);	
+                		}
+                	} else if (object.getValue() instanceof Integer) {
+                		if (((Integer)object.getValue()) == 3) {
+                			System.out.println("Close runner");
+                			System.exit(0);
+                		}
                 	}
                 }
                 synchronized (this) {
@@ -144,68 +160,50 @@ public class WindowsControler implements Runnable, Observer {
 	}
 	
 	private void confReader() {
-		Thread thisThread = Thread.currentThread();
 		try {
 			cr = new ConfReader(handler, configFile.getCanonicalPath());
 		} catch (ParserConfigurationException e) {
 			JOptionPane.showMessageDialog(null, e.getMessage(), "Error in the configuration file", JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
-			thisThread.interrupt();
+			System.exit(-1);
 		} catch (ParseException e) {
 			JOptionPane.showMessageDialog(null, e.getMessage(), "Error in the configuration file", JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
-			thisThread.interrupt();
+			System.exit(-1);
 		} catch (IOException e) {
 			JOptionPane.showMessageDialog(null, e.getMessage(), "Error in the configuration file", JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
-			thisThread.interrupt();
+			System.exit(-1);
 		} catch (SAXException e) {
 			JOptionPane.showMessageDialog(null, e.getMessage(), "Error in the configuration file", JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
-			thisThread.interrupt();
+			System.exit(-1);
 		}
 	}
 	
 	private void sqlReader() {
-		Thread thisThread = Thread.currentThread();
 		try {
 			sr = new SqlReader(handler, queriesFile.getCanonicalPath());
 		} catch (ParseException e) {
 			JOptionPane.showMessageDialog(null, e.getMessage(), "Error in the statements file", JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
-			thisThread.interrupt();
+			System.exit(-1);
 		} catch (FileNotFoundException e) {
 			JOptionPane.showMessageDialog(null, e.getMessage(), "Error in the statements file", JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
-			thisThread.interrupt();
+			System.exit(-1);
 		} catch (IOException e) {
 			JOptionPane.showMessageDialog(null, e.getMessage(), "Error in the statements file", JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
-			thisThread.interrupt();
+			System.exit(-1);
 		}
 	}
 	
-	private void sqlRunner() {
-		Thread thisThread = Thread.currentThread();
-		try {
-			new SqlRunner(handler, sr.getsQueries(), sr.getdQueries(), cr.getServers());
-		} catch (ClassNotFoundException e) {
-			JOptionPane.showMessageDialog(null, e.getMessage(), "Error while running SQL statements", JOptionPane.ERROR_MESSAGE);
-			e.printStackTrace();
-			thisThread.interrupt();
-		} catch (SQLException e) {
-			JOptionPane.showMessageDialog(null, e.getMessage(), "Error while running SQL statements", JOptionPane.ERROR_MESSAGE);
-			e.printStackTrace();
-			thisThread.interrupt();
-		} catch (InstantiationException e) {
-			JOptionPane.showMessageDialog(null, e.getMessage(), "Error while running SQL statements", JOptionPane.ERROR_MESSAGE);
-			e.printStackTrace();
-			thisThread.interrupt();
-		} catch (IllegalAccessException e) {
-			JOptionPane.showMessageDialog(null, e.getMessage(), "Error while running SQL statements", JOptionPane.ERROR_MESSAGE);
-			e.printStackTrace();
-			thisThread.interrupt();
-		}
+	private int sqlRunner() {
+		SqlRunner srun = new SqlRunner(handler, sr.getsQueries(), sr.getdQueries(), cr.getServers());
+		if (srun.getEmailContent().length() > 5)
+			JOptionPane.showMessageDialog(null, srun.getEmailContent(), "Error while running statements", JOptionPane.ERROR_MESSAGE);
+		return srun.getEmailContent().length();
 	}
 
 
@@ -246,5 +244,9 @@ public class WindowsControler implements Runnable, Observer {
 
 	public void setQueriesFile(File queriesFile) {
 		this.queriesFile = queriesFile;
+	}
+
+	public void quit(int status) {
+		System.exit(status);
 	}
 }
