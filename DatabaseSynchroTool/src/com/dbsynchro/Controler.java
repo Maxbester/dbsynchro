@@ -2,7 +2,6 @@ package com.dbsynchro;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -79,61 +78,16 @@ public class Controler {
 		
 		try {
 			test1();
-//			test2();
 		} catch (MessagingException e1) {
 			e1.printStackTrace();
 			log.warning("EMAIL not sent: "+e1.getMessage());
 		}
 		log.severe("-- END of the program");
 	}
-	
-	public static void test2() throws MessagingException {
-		Email email = null;
-		
-		ConfReader cr = null;
-
-		// reading of the configuration
-		try {
-			cr = new ConfReader(handler, configFile);
-		} catch (ParserConfigurationException e) {
-			e.printStackTrace();
-			log.severe("ERROR: "+e.getMessage());
-		} catch (ParseException e) {
-			e.printStackTrace();
-			log.severe("ERROR: "+e.getMessage());
-		} catch (IOException e) {
-			e.printStackTrace();
-			log.severe("ERROR: "+e.getMessage());
-		} catch (SAXException e) {
-			e.printStackTrace();
-			log.severe("ERROR: "+e.getMessage());
-		}
-
-		log.config(cr.getServers().toString());
-
-		if (cr.isEmail()) {
-			email = cr.getEmail();
-			log.config(email.toString());
-		}
-
-		//reading of the statements
-		try {
-			new SqlReader(handler, statsFile);
-		} catch (ParseException e) {
-			e.printStackTrace();
-			log.severe("ERROR: "+e.getMessage());
-			if (email != null) 
-				email.send(e.toString());
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			log.severe("ERROR: "+e.getMessage());
-			if (email != null) 
-				email.send(e.toString());
-		}
-	}
 
 	public static void test1() throws MessagingException {
 		Email email = null;
+		String emailContent = new Date() + "\n\n";
 		
 		ConfReader cr = null;
 
@@ -143,15 +97,19 @@ public class Controler {
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
 			log.severe("ERROR: "+e.getMessage());
+			System.exit(-1);
 		} catch (ParseException e) {
 			e.printStackTrace();
 			log.severe("ERROR: "+e.getMessage());
+			System.exit(-1);
 		} catch (IOException e) {
 			e.printStackTrace();
 			log.severe("ERROR: "+e.getMessage());
+			System.exit(-1);
 		} catch (SAXException e) {
 			e.printStackTrace();
 			log.severe("ERROR: "+e.getMessage());
+			System.exit(-1);
 		}
 
 		log.config(cr.getServers().toString());
@@ -169,41 +127,26 @@ public class Controler {
 			e.printStackTrace();
 			log.severe("ERROR: "+e.getMessage());
 			if (email != null) 
-				email.send(e.toString());
+				email.send(emailContent+e.toString());
+			System.exit(-1);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 			log.severe("ERROR: "+e.getMessage());
 			if (email != null) 
-				email.send(e.toString());
+				email.send(emailContent+e.toString());
+			System.exit(-1);
 		}
 
-			log.info("Number of local statements: "+sr.getsQueries().size());
+		log.info("Number of local statements: "+sr.getsQueries().size());
 
-			log.info("Number of distant statements: "+sr.getdQueries().size());
+		log.info("Number of distant statements: "+sr.getdQueries().size());
 			
-			try {
-				new SqlRunner(handler, sr.getsQueries(), sr.getdQueries(), cr.getServers());
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
-				log.severe("ERROR: "+e.getMessage());
-				if (email != null) 
-					email.send(e.toString());
-			} catch (SQLException e) {
-				e.printStackTrace();
-				log.severe("ERROR: "+e.getMessage());
-				if (email != null) 
-					email.send(e.toString());
-			} catch (InstantiationException e) {
-				e.printStackTrace();
-				log.severe("ERROR: "+e.getMessage());
-				if (email != null) 
-					email.send(e.toString());
-			} catch (IllegalAccessException e) {
-				e.printStackTrace();
-				log.severe("ERROR: "+e.getMessage());
-				if (email != null) 
-					email.send(e.toString());
-			}
+		SqlRunner srunner = new SqlRunner(handler, sr.getsQueries(), sr.getdQueries(), cr.getServers());
+		emailContent += srunner.getEmailContent() + "\n";
+		
+		if (email != null && emailContent.length() > 40) {
+			email.send(emailContent);
+		}
 	}
 	
 	/**
