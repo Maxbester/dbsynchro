@@ -57,7 +57,7 @@ public class WindowsControler extends Thread implements Observer {
 
 			handler.setFormatter(new Formatter() {
 
-				private SimpleDateFormat format	= new SimpleDateFormat("dd-MMM-yyyy HH:mm:SSS");
+				private SimpleDateFormat format	= new SimpleDateFormat("dd/MM/yy HH:mm:SSS");
 
 				@Override
 				public String format(LogRecord record) {
@@ -136,15 +136,7 @@ public class WindowsControler extends Thread implements Observer {
                 }
                 else if(object.getKey() instanceof Runner) {
                 	if (object.getValue() instanceof ActionEvent) {
-                		Process p = new Process("Running queries","Please wait...");
-                		p.setVisible(true);
-                		if (sqlRunner() > 5) {
-                			p.dispose();
-                			JOptionPane.showMessageDialog(null, "Queries were executed with some problems.", "Warning", JOptionPane.WARNING_MESSAGE);
-                		} else {
-                			p.dispose();
-                			JOptionPane.showMessageDialog(null, "Queries were executed successfully.", "Done", JOptionPane.INFORMATION_MESSAGE);	
-                		}
+                		sqlRunner();
                 	} else if (object.getValue() instanceof Integer) {
                 		if (((Integer)object.getValue()) == 3) {
                 			System.out.println("Close runner");
@@ -199,11 +191,18 @@ public class WindowsControler extends Thread implements Observer {
 		}
 	}
 	
-	private int sqlRunner() {
+	private void sqlRunner() {
+		Process p = new Process("Running queries","Please wait...");
+		p.setVisible(true);
 		SqlRunner srun = new SqlRunner(handler, sr.getsQueries(), sr.getdQueries(), cr.getServers());
-		if (srun.getEmailContent().length() > 5)
+		p.dispose();
+
+		if (srun.getEmailContent().length() > 5) {
 			JOptionPane.showMessageDialog(null, srun.getEmailContent(), "Error while running statements", JOptionPane.ERROR_MESSAGE);
-		return srun.getEmailContent().length();
+			JOptionPane.showMessageDialog(null, "Queries were executed with some problems.", "Warning", JOptionPane.WARNING_MESSAGE);
+		} else {
+			JOptionPane.showMessageDialog(null, "Queries were executed successfully.", "Done", JOptionPane.INFORMATION_MESSAGE);
+		}
 	}
 
 
