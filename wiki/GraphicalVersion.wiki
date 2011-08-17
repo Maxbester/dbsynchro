@@ -1,4 +1,5 @@
 #summary Friendly user interface
+#labels Phase-Support
 
 = Database Sycnhro Graphical User Interface =
 
