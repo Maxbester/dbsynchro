@@ -69,7 +69,7 @@ jdbc:mysql://[host:port],[host:port].../[database][?propertyName1][=propertyValu
 === Email notification description ===
 When running the _non graphical version_ of the software, emails can be sent to warn that an error occurred.
 
-This feature is useful when this program is runned by a task scheduler ([http://en.wikipedia.org/wiki/Cron cron] or [http://en.wikipedia.org/wiki/At_%28Windows%29 at] for example).
+This feature is useful when this program is run by a task scheduler ([http://en.wikipedia.org/wiki/Cron cron] or [http://en.wikipedia.org/wiki/At_%28Windows%29 at] for example).
 
 *But you are not obliged to specify email configuration if you do not want to receive emails.*
 
