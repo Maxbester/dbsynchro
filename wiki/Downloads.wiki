@@ -7,6 +7,15 @@ Same functionalities as the previous version but include a friendly user interfa
 You can download this software here:
  * [http://code.google.com/p/dbsynchro/downloads/detail?name=DbSynchroGui-1.0.jar&can=2&q= GUI software]
 
+== Version 1.3 ==
+When an error occurs in SQL statements, the program runs until the end anyway.
+
+Moreover, SQL statements parsing was improved with the use of a regular expression.
+
+You can download the jar file and the associated files below. Choose your archive format.
+  * [http://code.google.com/p/dbsynchro/downloads/detail?name=DbSyncrho-1.3.tar.gz&can=2&q= .tar.gz]
+  * [http://code.google.com/p/dbsynchro/downloads/detail?name=DbSynchro-1.3.zip&can=2&q= .zip]
+
 
 == Version 1.2 ==
 All the program has been updated. Now it offers the possibility to specify various sources and targets.
