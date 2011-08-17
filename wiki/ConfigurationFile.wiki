@@ -37,7 +37,7 @@ Attributes must be enclosed by: <code language="xml">
 
 Tags are specified in the table bellow:
 || *Name* || *Description* || *Example* ||  *Required* ||
-|| name || The name of the database which will be used for the statements (must not contain any space) || <code language="xml"><name>My_Database</name></code> || yes ||
+|| name || The name of the database which will be used for the statements (must not contain any space) || <code language="xml"><name>`My_Database`</name></code> || yes ||
 || url || The protocol, URL, port and name of the database on your server || <code language="xml"><url>jdbc:mysql://localhost:3306/dbName</url></code> || yes ||
 || driver || Name of the driver corresponding to your database type (currently only MySQL and MSSQL are available) || <code language="xml"><driver>com.mysql.jdbc.Driver</driver></code> || yes ||
 || login || The user login for the connection to the database (this is not the login of a server user but of a database user) || <code language="xml"><login>admin</login></code>  || yes ||
