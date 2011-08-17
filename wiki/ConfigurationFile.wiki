@@ -1,0 +1,99 @@
+#summary Specification of the XML configuration file
+#labels Phase-Deploy,Featured
+
+= Configuration file =
+
+== Introduction ==
+This page is dedicated to the configuration file.
+
+It is a XML file that contains information about:
+ * databases you want to modify
+ * email for notification
+
+
+== How to write the configuration file? ==
+
+If you downloaded archive of the last version of the software, you already have an example of a valid configuration file.
+
+The configuration file must begin with a XML header:
+<code language="xml">
+<?xml version="1.0" encoding="UTF-8"?>
+</code>
+
+Feel free to change the XML version and the encoding.
+
+Then, all the configuration must be placed between a "config" tag:
+<code language="xml">
+<config></config>
+</code>
+
+=== Database description ===
+You can as many databases as you want. The minimum is two: one source and one target.
+The source and the target can be the same but must have a different name.
+
+Attributes are specified in the table bellow:
+|| *Name* || *Description* || *Example* ||  *Required* ||
+|| name || The name of the database which will be used for the statements (must not contain any space) || <code language="xml"><name>My_Database</name></code> || yes ||
+|| url || The protocol, URL, port and name of the database on your server || <code language="xml"><url>jdbc:mysql://localhost:3306/dbName</url></code> || yes ||
+|| driver || Name of the driver corresponding to your database type (currently only MySQL and MSSQL are available) || <code language="xml"><driver>com.mysql.jdbc.Driver</driver></code> || yes ||
+|| login || The user login for the connection to the database (this is not the login of a server user but of a database user) || <code language="xml"><login>admin</login></code>  || yes ||
+|| password || The user login for the connection to the database (this is not the login of a server user but of a database user) || <code language="xml"><password>your_password</password></code>  || yes ||
+
+==== Driver information ====
+Currently only MySQL and MSSQL are available but if you need other database driver, please feel free to [http://code.google.com/p/dbsynchro/issues/entry add an issue].
+
+ * MySQL driver: *com.mysql.jdbc.Driver*
+ * MSSQL driver: *com.microsoft.sqlserver.jdbc.SQLServerDriver*
+
+==== MSSQL driver ====
+With MSSQL you can run several instances on the same server. To get further information, visit: [http://msdn.microsoft.com/en-us/library/ms378428.aspx Building the Connection URL].
+
+The URL syntax is:
+{{{
+jdbc:sqlserver://[serverName[\instanceName][:portNumber]][;property=value[;property=value]]
+}}}
+
+==== MySQL driver ====
+
+To get further information, visit: [http://dev.mysql.com/doc/refman/5.0/en/connector-j-reference-configuration-properties.html URL Syntax and Configuration Properties].
+
+The URL syntax is:
+{{{
+jdbc:mysql://[host:port],[host:port].../[database][?propertyName1][=propertyValue1][&propertyName2][=propertyValue2]...
+}}}
+
+== Example ==
+<code language="xml">
+{{{
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<email>
+		<smtp port="25">localhost</smtp>
+		<from>dbSynchro@gmail.com</from>
+		<subject>[DbSynchroTool] Synchronisation failed</subject>
+		<recipient>your_email@gmail.com</recipient>
+	</email>
+	<server>
+		<name>MS_Server</name>
+		<url>jdbc:sqlserver://localhost:1434;instance=instanceName;databaseName=db1</url>
+		<login>admin</login>
+		<password>admin</password>
+		<driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</driver>
+	</server>
+	<server>
+		<name>RedHat_Server</name>
+		<url>jdbc:mysql://localhost/db1</url>
+		<login>root</login>
+		<password>redhat</password>
+		<driver>com.mysql.jdbc.Driver</driver>
+	</server>
+	<server>
+		<name>Debian_Server</name>
+		<url>jdbc:mysql://localhost/database</url>
+		<login>root</login>
+		<password>debian</password>
+		<driver>com.mysql.jdbc.Driver</driver>
+	</server>
+</config>
+}}}
+</code>
