@@ -1,5 +1,5 @@
 #summary DbSynchroTool details
-#labels Featured,Phase-Requirements
+#labels Featured,Phase-Support
 #sidebar SideBar
 
 =Home page=
@@ -8,42 +8,49 @@
 
 ==Introduction==
 
-This software offers the possibility to synchronize two databases hosted on different servers.
+This software offers the possibility to synchronize databases hosted on different servers.
 
-You can transfer all the tables from one to the other or just pick up some fields.
+You can transfer all the tables from one to an other or just pick up some fields.
+
+So if you need a software that selects data in a database (or table) and stores them into an other database (or table), you are in the good place!
 
 ==Requirements==
 
 This software has been tested on Linux (Red Hat Server, Ubuntu) and on Microsoft Windows Server 2003.
 
+You need a [http://en.wikipedia.org/wiki/Java_Virtual_Machine JVM] to be installed in the machine that runs the program. You can download it [http://www.oracle.com/technetwork/java/javase/downloads/index.html here].
+
 If this software does not work with your server, please contact us or [http://code.google.com/p/dbsynchro/issues/entry add an issue].
-
-== Installation ==
-
-First of all, download the last version of the software [Downloads here].
 
 ==How to use this program?==
 
-This software is a Java program which should be launched like any jar file.
+If you want to launch the graphical version, just double click on it (or type `java -jar DbSynchroGui-x.x.jar` in a terminal).
 
-You must specify both configuration and queries files. Besides, you can specify other option such as the level of the logger.
+The program is developed with [http://en.wikipedia.org/wiki/Java_%28programming_language%29 Java] can be launched like any [http://en.wikipedia.org/wiki/JAR_%28file_format%29 jar file].
+
+You must specify both [ConfigurationFile configuration] and [SQLFile queries] files if you run the _non graphical_ version. Besides, you can specify other option such as the level of the logger.
 
 ===Examples===
 
 {{{
-java -jar DbSynchro-X.X.jar --config config.xml --queries queries.sql --logger CONFIG
+java -jar DbSynchroGui-x.x.jar
 }}}
 
 {{{
-java -jar DbSynchro-X.X.jar -c config.xml -q queries.sql
+java -jar DbSynchro-x.x.jar --config config.xml --queries queries.sql --logger CONFIG
 }}}
 
-*OR*
+{{{
+java -jar DbSynchro-x.x.jar -c config.xml -q queries.sql
+}}}
 
+*_OR_*
 
 [http://etud.insa-toulouse.fr/~buisson/TEMP/run.png http://etud.insa-toulouse.fr/~buisson/TEMP/run.png]
 
 ==Libraries==
+
+This software is developed with [http://www.eclipse.org/ Eclipse].
 
 Database Synchro Tool uses:
   * [http://code.google.com/p/guava-libraries/ The Guava Libraries]
@@ -51,5 +58,3 @@ Database Synchro Tool uses:
   * [http://www.mysql.com/downloads/connector/j/ MySQL Connector]
   * [http://msdn.microsoft.com/en-us/sqlserver/aa937724 Microsoft JDBC Driver for SQL Server]
   * [http://en.wikipedia.org/wiki/Swing_%28Java%29 Swing for the graphical version]
-
-====_If you like this software you can visit my professional website: [http://etud.insa-toulouse.fr/~buisson/ here]._====
