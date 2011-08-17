@@ -31,7 +31,11 @@ Then, all the configuration must be placed between a "config" tag:
 You can as many databases as you want. The minimum is two: one source and one target.
 The source and the target can be the same but must have a different name.
 
-Attributes are specified in the table bellow:
+Attributes must be enclosed by: <code language="xml">
+<server></server>
+</code>
+
+Tags are specified in the table bellow:
 || *Name* || *Description* || *Example* ||  *Required* ||
 || name || The name of the database which will be used for the statements (must not contain any space) || <code language="xml"><name>My_Database</name></code> || yes ||
 || url || The protocol, URL, port and name of the database on your server || <code language="xml"><url>jdbc:mysql://localhost:3306/dbName</url></code> || yes ||
@@ -62,7 +66,25 @@ The URL syntax is:
 jdbc:mysql://[host:port],[host:port].../[database][?propertyName1][=propertyValue1][&propertyName2][=propertyValue2]...
 }}}
 
-== Example ==
+=== Email notification description ===
+When running the _non graphical version_ of the software, emails can be sent to warn that an error occurred.
+
+This feature is useful when this program is runned by a task scheduler ([http://en.wikipedia.org/wiki/Cron cron] or [http://en.wikipedia.org/wiki/At_%28Windows%29 at] for example).
+
+*But you are not obliged to specify email configuration if you do not want to receive emails.*
+
+Attributes must be enclosed by:
+<code language="xml">
+<email></email></code>
+
+Tags are specified in the table bellow:
+|| *Name* || *Description* || *Example* ||  *Required* ||
+|| smtp || The SMTP address of the server. The port must be placed in attribute || <code language="xml"><smtp port="25">smtp.myserver.com</smtp></code> || yes ||
+|| from || The sender email address || <code language="xml"><from>DbSynchro@domain.com</from></code> || yes ||
+|| subject || The subject of the email you will receive || <code language="xml"><subject>`[`DbSynchro`]` An error occurred</subject></code> || no ||
+|| recipient || Email address of a recipient. You can as many recipients as you want. || <code language="xml"><login>you@domain.com</login></code>  || at least one ||
+
+== Complete configuration file example ==
 <code language="xml">
 {{{
 <?xml version="1.0" encoding="UTF-8"?>
