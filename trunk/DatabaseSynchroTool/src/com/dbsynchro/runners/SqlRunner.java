@@ -128,8 +128,16 @@ public class SqlRunner {
 				open = temp.indexOf("[");
 				close = temp.indexOf("]");
 				int column = Integer.parseInt(temp.substring(open+1, close));
-					query = query.replace(temp.substring(open, close+1), sourceStatement.getString(column));
-				temp = temp.substring(close+1);
+
+				String colValue = "NULL";
+				// check that the value in the SQL Table is not null
+				if (sourceStatement.getString(column) != null) {
+					colValue = sourceStatement.getString(column);
+				}
+
+				query = query.replace(temp.substring(open, close+1), colValue);
+
+				temp = (temp.substring(close+1) == null ? "" : temp.substring(close+1));
 			}
 		} catch (SQLException e) {
 			log.severe("ERROR: "+e.getMessage());
