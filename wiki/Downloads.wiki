@@ -3,7 +3,7 @@
 = Downloads =
 
 == Graphical Version ==
-Same functionalities as the previous version but include a friendly user interface.
+Same functionalities as the console version but includes a friendly user interface.
 You can download this software here:
  * [http://code.google.com/p/dbsynchro/downloads/detail?name=DbSynchroGui-1.0.jar&can=2&q= GUI software]
 
