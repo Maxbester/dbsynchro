@@ -12,7 +12,7 @@ This software offers the possibility to synchronize databases hosted on differen
 
 You can transfer all the tables from one to an other or just pick up some fields.
 
-So if you need a software that selects data in a database (or table) and stores them into an other database (or table), you are in the good place!
+So if you need a software that selects data in a database (or table) and transfers them into an other database (or table), you are in the good place!
 
 ==Requirements==
 
@@ -26,22 +26,22 @@ If this software does not work with your server, please contact us or [http://co
 
 If you want to launch the graphical version, just double click on it (or type `java -jar DbSynchroGui-x.x.jar` in a terminal).
 
-The program is developed with [http://en.wikipedia.org/wiki/Java_%28programming_language%29 Java] can be launched like any [http://en.wikipedia.org/wiki/JAR_%28file_format%29 jar file].
+The program is developed with [http://en.wikipedia.org/wiki/Java_%28programming_language%29 Java] and can be launched like any [http://en.wikipedia.org/wiki/JAR_%28file_format%29 jar file].
 
-You must specify both [ConfigurationFile configuration] and [SQLFile queries] files if you run the _non graphical_ version. Besides, you can specify other option such as the level of the logger.
+You must specify both [ConfigurationFile configuration] and [SQLFile queries] files if you run the _non graphical_ version. Besides, you can specify other option such as the logger file configuration.
 
 ===Examples===
 
 {{{
-java -jar DbSynchroGui-x.x.jar
+java -jar DbSyncGui-x.x.jar
 }}}
 
 {{{
-java -jar DbSynchro-x.x.jar --config config.xml --queries queries.sql --logger CONFIG
+java -jar DbSync-x.x.jar --config config.xml --queries queries.sql --logger logger.properties
 }}}
 
 {{{
-java -jar DbSynchro-x.x.jar -c config.xml -q queries.sql
+java -jar DbSync-x.x.jar -c config.xml -q queries.sql
 }}}
 
 *_OR_*
@@ -50,10 +50,10 @@ java -jar DbSynchro-x.x.jar -c config.xml -q queries.sql
 
 ==Libraries==
 
-This software is developed with [http://www.eclipse.org/ Eclipse].
+This software is developed with [http://www.eclipse.org/ Eclipse Indigo].
 
 Database Synchro Tool uses:
-  * [http://code.google.com/p/guava-libraries/ The Guava Libraries]
+  * [http://logging.apache.org/log4j/1.2/ Apache log4j]
   * [http://kenai.com/projects/javamail JavaMail]
   * [http://www.mysql.com/downloads/connector/j/ MySQL Connector]
   * [http://msdn.microsoft.com/en-us/sqlserver/aa937724 Microsoft JDBC Driver for SQL Server]
