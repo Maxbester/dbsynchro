@@ -27,7 +27,7 @@
   * [Version1_3#Requirements Requirements]
   * [Version1_3#How_to_use_this_program? How to use this program?]
   * [Version1_3#Libraries Libraries]
-  * [Downloads Downloads]
+  * [Downloads_1_3 Downloads]
    * [Download_1_3#Graphical_Version Graphical Version]
    * [Download_1_3#Version_1.3 Version 1.3]
   * [GraphicalVersion Friendly interface version]
