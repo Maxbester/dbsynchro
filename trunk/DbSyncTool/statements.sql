@@ -1,2 +1,4 @@
-s:bdd1:SELECT test1.id, test1.a, test1.b FROM test1;
-d:bdd2:UPDATE test2 SET z=[2], h=([3]+20) WHERE idx=[1];
+s:bdd1:SELECT o.num, o.date FROM orders o WHERE o.state = 'sent';
+d:bdd2:INSERT INTO oldOrders (id,date) VALUES ('[1]','[2]');
+s:bdd1:SELECT o.num, o.date FROM orders o WHERE o.state = 'received';
+d:bdd2:INSERT INTO newOrders (id) VALUES ('[1]');

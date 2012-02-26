@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -18,7 +19,7 @@ public class Main {
 	private ConfReader confReader;
 	private SqlReader sqlReader;
 	private SqlRunner sqlRunner;
-	private List<Database> databases;
+	private Set<Database> databases;
 	private List<Query> queries;
 
 	private static final Logger log = Logger.getLogger(Main.class.getName());

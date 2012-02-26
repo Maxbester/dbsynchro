@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-
--->
 <config>
 	<email>
-		<smtp port="25">localhost</smtp>
+		<smtp>
+			<address>localhost</address>
+			<port>25</port>
+			<login></login>
+			<password></password>
+		</smtp>
 		<from>dbSynchro@gmail.fr</from>
 		<subject>Synchronisation failed</subject>
 		<recipient>maxime.buisson1@gmail.com</recipient>

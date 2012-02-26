@@ -9,12 +9,14 @@ import org.apache.log4j.Logger;
 
 /**
  * 
+ * Run the SQL statements.
+ * 
  * @author Maxime Buisson
  *
  */
 public class SqlRunner {
 	
-	private final Logger log = Logger.getLogger(SqlRunner.class.getName());
+	private static final Logger log = Logger.getLogger(SqlRunner.class.getName());
 	private String emailContent;
 	private List<Query> queries;
 
@@ -29,7 +31,9 @@ public class SqlRunner {
 	public void runQueries() {
 		log.info("Running SQL statements");
 
-		log.fatal("query size: "+queries.size());
+		log.info("Number of source queries: "+queries.size());
+
+		int changedRows = 0;
 
 		for (Query q : queries) {
 			Database sourceDb = q.getSourceDatabase();
@@ -44,7 +48,7 @@ public class SqlRunner {
 
 					targetDb.connect();
 					while (sourceRS.next()) {
-						runDistantQuery(targetStatement, sourceRS, targetDb);
+						changedRows += runDistantQuery(targetStatement, sourceRS, targetDb);
 					}
 					targetDb.disconnect();
 				}
@@ -54,12 +58,13 @@ public class SqlRunner {
 				log.error("Cannot connect to the database: "+e.getMessage());
 			}			
 		}
+		log.info("Affected rows: "+changedRows);
 		log.info("SQL statements finished\n");
 	}
 
 	private int runDistantQuery(String targetStatement, ResultSet sourceRs, Database targetDb) {
 		if (sourceRs == null || targetStatement == null || targetDb == null) {
-			log.warn("WARNING: distant query or source statement null.");
+			log.warn("Distant query or source statement null.");
 			return 0;
 		}
 

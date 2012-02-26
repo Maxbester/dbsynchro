@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+<xs:simpleType name="portType">
+    <xs:restriction base="xs:integer">
+      <xs:minInclusive value="1"/>
+      <xs:maxInclusive value="65535"/>
+    </xs:restriction>
+</xs:simpleType>
+
+<xs:attribute name="port" type="portType" default="25"/>
+
+<xs:simpleType name="ipAddressType">
+	<xs:restriction base="xs:string">
+		<xs:pattern value="((((25[0-5])|(2[0-4][0-9])|([01]?[0-9]?[0-9]))\.){3}((25[0-5])|(2[0-4][0-9])|([01]?[0-9]?[0-9])))(\-((((25[0-5])|(2[0-4][0-9])|([01]?[0-9]?[0-9]))\.){3}((25[0-5])|(2[0-4][0-9])|([01]?[0-9]?[0-9]))))?|localhost"/>
+	</xs:restriction>
+</xs:simpleType>
+
+<xs:complexType name="smtpType">
+  <xs:simpleContent>
+    <xs:extension base="xs:string">
+      <xs:attribute name="port"/>
+    </xs:extension>
+  </xs:simpleContent>
+</xs:complexType>
+
+<xs:complexType name="email">
+	<xs:sequence>
+		<xs:element name="smtp" type="smtpType" minOccurs="1" maxOccurs="1"/>
+		<xs:element name="from" type="xs:string" minOccurs="1" maxOccurs="1"/>
+		<xs:element name="subject" type="xs:string" default="Synchronisation failed" minOccurs="1" maxOccurs="1"/>
+		<!--<xs:element name="recipients" minOccurs="1" maxOccurs="1">
+			<xs:complexType>
+				<xs:sequence>-->
+					<xs:element name="recipient" type="xs:string" minOccurs="1" maxOccurs="unbounded"/>
+				<!--</xs:sequence>
+			</xs:complexType>
+		</xs:element>-->
+	</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="database">
+	<xs:sequence>
+		<xs:element name="name" type="xs:string" minOccurs="1" maxOccurs="1"/>
+		<xs:element name="url" type="xs:string" default="localhost" minOccurs="1" maxOccurs="1"/>
+		<xs:element name="login" type="xs:string" minOccurs="1" maxOccurs="1"/>
+		<xs:element name="password" type="xs:string" minOccurs="1" maxOccurs="1"/>
+		<xs:element name="driver" type="xs:string" default="com.mysql.jdbc.Driver" minOccurs="1" maxOccurs="1"/>
+	</xs:sequence>
+</xs:complexType>
+
+<xs:element name="config">
+	<xs:complexType>
+		<xs:sequence>
+			<xs:element name="email" minOccurs="0" maxOccurs="1"/>
+			<!--<xs:element name="databases" minOccurs="1" maxOccurs="1">
+				<xs:complexType>
+					<xs:sequence> -->
+						<xs:element name="database" type="database" minOccurs="2" maxOccurs="unbounded"/>
+					<!--</xs:sequence>
+				</xs:complexType>
+			</xs:element> -->
+		</xs:sequence>
+	</xs:complexType>
+</xs:element>
+
+</xs:schema>
