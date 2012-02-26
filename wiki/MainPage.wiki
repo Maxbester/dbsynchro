@@ -39,10 +39,6 @@ You must specify both [ConfigurationFile configuration] and [SQLFile queries] fi
 ===Examples===
 
 {{{
-java -jar DbSyncGui-x.x.jar
-}}}
-
-{{{
 java -jar DbSync-x.x.jar --config config.xml --queries queries.sql --logger logger.properties
 }}}
 
@@ -50,15 +46,12 @@ java -jar DbSync-x.x.jar --config config.xml --queries queries.sql --logger logg
 java -jar DbSync-x.x.jar -c config.xml -q queries.sql
 }}}
 
-*_OR_*
-
-[http://etud.insa-toulouse.fr/~buisson/TEMP/run.png http://etud.insa-toulouse.fr/~buisson/TEMP/run.png]
-
 ==Libraries==
 
 This software is developed with [http://www.eclipse.org/ Eclipse Indigo].
 
 Database Synchro Tool uses:
+  * [http://xstream.codehaus.org/ XStream]
   * [http://logging.apache.org/log4j/1.2/ Apache log4j]
   * [http://kenai.com/projects/javamail JavaMail]
   * [http://www.mysql.com/downloads/connector/j/ MySQL Connector]
