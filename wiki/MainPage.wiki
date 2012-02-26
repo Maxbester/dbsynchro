@@ -6,6 +6,12 @@
 
 <wiki:toc max_depth="2" />
 
+
+
+*1.4 version coming soon*
+
+
+
 ==Introduction==
 
 This software offers the possibility to synchronize databases hosted on different servers.
