@@ -5,6 +5,8 @@ Version 1.4
 
 = Configuration file =
 
+<wiki:toc max_depth="3" />
+
 
 == Introduction ==
 This page is dedicated to the configuration file.
