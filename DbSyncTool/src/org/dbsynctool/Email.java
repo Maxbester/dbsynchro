@@ -10,6 +10,7 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+
 /**
  * 
  * @author Maxime Buisson
@@ -18,16 +19,14 @@ import javax.mail.internet.MimeMessage;
 public class Email {
 
 	private final String from;
-	private final String smtp;
-	private final String port;
+	private final Smtp smtp;
 	private final String subject;
 	private Set<String> recipients;
 
 	public Email(String from, Set<String> recipients, String smtp, String port, String subject) {
 		this.from = from;
 		this.recipients = recipients;
-		this.smtp = smtp;
-		this.port = port;
+		this.smtp = new Smtp(smtp, port);
 		this.subject = subject;
 	}
 
@@ -36,11 +35,11 @@ public class Email {
 	}
 
 	public String getSmtp() {
-		return smtp;
+		return smtp.getAddress();
 	}
 
 	public String getPort() {
-		return port;
+		return smtp.getPort();
 	}
 
 	public String getSubject() {
@@ -64,8 +63,6 @@ public class Email {
 		StringBuilder sb = new StringBuilder();
 		sb.append("(");
 		sb.append(smtp);
-		sb.append(":");
-		sb.append(port);
 		sb.append(") - from ");
 		sb.append(from);
 		sb.append(" to ");
@@ -87,31 +84,43 @@ public class Email {
 	public void send(String content) throws MessagingException {
 		//Set the host smtp address
 	     Properties props = new Properties();
-	     props.put("mail.smtp.host", smtp);
-	     props.put("mail.protocol.port", port);
-	     
+	     props.put("mail.smtp.host", smtp.getAddress());
+	     props.put("mail.protocol.port", smtp.getPort());
+
+	     boolean auth = smtp.hasAuth();
+	     if (auth) {
+	    	 props.put("mail.smtp.auth", "true");
+	     }
+
 	     // create some properties and get the default Session
-	     Session session = Session.getDefaultInstance(props, null);
+	     Session session = Session.getDefaultInstance(props);
 	     session.setDebug(false);
-	     
+
 	     // create a message
-	     Message msg = new MimeMessage(session);
-	     
+	     MimeMessage message = new MimeMessage(session);
 	     // set the from and to address
-	     InternetAddress addressFrom = new InternetAddress(from);
-	     msg.setFrom(addressFrom);
-	     
+	     message.setFrom(new InternetAddress(from));
+
 	     InternetAddress[] addressTo = new InternetAddress[recipients.size()];
 
 	     for (int i = 0 ; i < recipients.size() ; i++) {
 	         addressTo[i] = new InternetAddress((String)recipients.toArray()[0]);
 	         i++;
 	     }
-	     msg.setRecipients(Message.RecipientType.TO, addressTo);
-	     
+	     message.setRecipients(Message.RecipientType.TO, addressTo);
+
 	     // Setting the Subject and Content Type
-	     msg.setSubject(subject);
-	     msg.setContent(content, "text/plain");
-	     Transport.send(msg);
+	     message.setSubject(subject);
+	     message.setText(content);
+
+	     message.saveChanges();
+
+	     Transport tr = session.getTransport("smtp");
+	     if (auth) {
+	    	 tr.connect(smtp.getAddress(), smtp.getLogin(), smtp.getPassword());
+	     }
+	     tr.sendMessage(message,message.getAllRecipients());
+
+	     tr.close();
 	}
 }

@@ -12,7 +12,7 @@ import org.apache.log4j.Logger;
 
 public class Database {
 	
-	private final Logger log = Logger.getLogger(Database.class.getName());
+	private static final Logger log = Logger.getLogger(Database.class.getName());
 
 	private String name;
 	private String url;

@@ -5,20 +5,21 @@ import java.io.FileNotFoundException;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
 public class SqlReader {
 
-	private final Logger log = Logger.getLogger(SqlReader.class.getName());
+	private static final Logger log = Logger.getLogger(SqlReader.class.getName());
 
 	private final File sqlFile;
 
-	private List<Database> databases;
+	private Set<Database> databases;
 	private List<Query> queries;
 
-	public SqlReader(String statsFile, List<Database> databases, List<Query> queries) {
+	public SqlReader(String statsFile, Set<Database> databases, List<Query> queries) {
 		this.databases = databases;
 		this.queries = queries;
 		sqlFile = new File(statsFile);
