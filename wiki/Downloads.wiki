@@ -7,6 +7,9 @@ Same functionalities as the console version but includes a friendly user interfa
 You can download this software here:
  * [http://code.google.com/p/dbsynchro/downloads/detail?name=DbSynchroGui-1.0.jar&can=2&q= GUI software]
 
+== Version 1.4 ==
+*Coming soon*! Under construction.
+
 == Version 1.3 ==
 When an error occurs in SQL statements, the program runs until the end anyway.
 
