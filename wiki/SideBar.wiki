@@ -21,7 +21,6 @@
   * [Logger_1_4 Logger]
    * [Logger_1_4#Introduction Introduction]
    * [Logger_1_4#How_to_use_it? How to use it?]
-   * [Logger_1_4#Levels Levels]
    * [Logger_1_4#Files Files]
  * [Version1_3 Version 1.3]
   * [Version1_3#Introduction Introduction]
