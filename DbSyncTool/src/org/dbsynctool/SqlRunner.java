@@ -105,6 +105,15 @@ public class SqlRunner {
 		// return number of affected rows.
 		return nbAffectedRows;
 	}
+
+	/**
+	 * Remove a query from the list of queries to run.
+	 * 
+	 * @param query
+	 */
+	public void removeQuery(Query query) {
+		queries.remove(query);
+	}
 	
 	public String getEmailContent() {
 		return emailContent;

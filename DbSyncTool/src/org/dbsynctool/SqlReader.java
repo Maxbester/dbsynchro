@@ -87,6 +87,14 @@ public class SqlReader {
 		scanner.close();
 	}
 
+	/**
+	 * Remove a query from the list of queries to run.
+	 * 
+	 * @param query
+	 */
+	public void removeQuery(Query query) {
+		queries.remove(query);
+	}
 
 	private Database findByName(String name) {
 		for (Database db : databases) {

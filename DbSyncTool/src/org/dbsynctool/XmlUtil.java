@@ -3,6 +3,7 @@ package org.dbsynctool;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
 
@@ -128,5 +129,52 @@ public class XmlUtil {
 		// map the XML file into a Config object
 		Config config = (Config) xstream.fromXML(xmlContent.toString());
 		return config;
+	}
+
+	/**
+	 * Write an XML config file.
+	 * 
+	 * @param databases
+	 * @param email
+	 * @throws IOException 
+	 */
+	public static void writeConfig(Config config) throws IOException {
+		XStream xstream = new XStream();
+
+		xstream = new XStream(new StaxDriver());
+
+		// map the config tag with the Config class
+		xstream.alias("config", Config.class);
+		// map the database tag with the Database class
+		xstream.alias("database", Database.class);
+		// map the email tag with the Email class
+		xstream.alias("email", Email.class);
+		// map the smtp tag with Smtp class
+		xstream.alias("smtp", Smtp.class);
+
+		// define that the databases are stored in an implicit collection
+		xstream.addImplicitCollection(Config.class, "databases", "database", Database.class);
+		// define that the email recipients are stored in an implicit collection
+		xstream.addImplicitCollection(Email.class, "recipients", "recipient", String.class);
+		
+		String content = xstream.toXML(config);
+
+		FileWriter writer = null;
+		try {
+			writer = new FileWriter("config.xml", true);
+			writer.write(content, 0, content.length());
+		} catch (IOException e) {
+			log.error("Cannot write in the configuration file.");
+			throw new IOException(e);
+		} finally {
+			if(writer != null){
+				try {
+					writer.close();
+				} catch (IOException e) {
+					log.warn("Cannot close the configuration file.");
+					throw new IOException(e);
+				}
+			}
+		}
 	}
 }
