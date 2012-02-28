@@ -25,7 +25,7 @@ public class Config {
 	 * @param databases
 	 * @param email
 	 */
-	private Config(Set<Database> databases, Email email) {
+	public Config(Set<Database> databases, Email email) {
 		this.databases = databases;
 		this.email = email;
 	}
