@@ -2,11 +2,16 @@ package org.dbsyncgui.view;
 
 import java.awt.BorderLayout;
 
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTable;
 import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -27,8 +32,27 @@ public class ConfigurationWindow extends JFrame {
 
 	private JTabbedPane tabbedPane;
 
-	private JTabbedPane configTabbedPane;
+	private JPanel queryEditorPanel;
+	private JScrollPane queryEditorScrollPane;
 	private JTextPane queryTextPane;
+	private JPanel queryButtonPanel;
+	private JButton saveQueriesButton;
+	private JButton exportQueriesButton;
+	private JButton importQueriesButton;
+
+	private JPanel configPanel;
+	private String[] columnNames = {"First Name",
+            "Last Name",
+            "Sport",
+            "# of Years",
+            "Vegetarian"};
+	private JTable configTablePanel;
+	private JPanel configButtonPanel;
+	private JButton addDatabaseButton;
+	private JButton editDatabaseButton;
+	private JButton removeDatabaseButton;
+	private JButton exportDatabaseButton;
+	private JButton importDatabaseButton;
 
 	public ConfigurationWindow() {
 		initComponents();
@@ -36,7 +60,7 @@ public class ConfigurationWindow extends JFrame {
 		setTitle("ConfigurationWindow");
 		getContentPane().setPreferredSize(getSize());
 		pack();
-		setLocationRelativeTo(null);
+		setLocationByPlatform(true);
 		setVisible(true);
 	}
 
@@ -44,38 +68,144 @@ public class ConfigurationWindow extends JFrame {
 		setLayout(new BorderLayout());
 		setJMenuBar(getConfigMenuBar());
 		add(getTabbedPane(), BorderLayout.CENTER);
-		setSize(320, 240);
-	}
-
-	private JTabbedPane getConfigTabbedPane() {
-		if (configTabbedPane == null) {
-			configTabbedPane = new JTabbedPane();
-		}
-		return configTabbedPane;
+		setSize(550, 350);
 	}
 
 	private JTabbedPane getTabbedPane() {
 		if (tabbedPane == null) {
 			tabbedPane = new JTabbedPane();
-			tabbedPane.addTab("Configuration", getConfigTabbedPane());
-			tabbedPane.addTab("Queries", getQueryTextPane());
+			tabbedPane.addTab("Configuration", getConfigPanel());
+			tabbedPane.addTab("Queries", getQueryEditorPanel());
 		}
 		return tabbedPane;
 	}
 
+	private JPanel getConfigPanel() {
+		if (configPanel == null) {
+			configPanel = new JPanel();
+			configPanel.setLayout(new BorderLayout());
+			configPanel.add(getConfigTablePanel(), BorderLayout.CENTER);
+			configPanel.add(getConfigButtonPanel(), BorderLayout.EAST);
+		}
+		return configPanel;
+	}
+
+	private JTable getConfigTablePanel() {
+		if (configTablePanel == null) {
+			configTablePanel = new JTable();
+			
+		}
+		return configTablePanel;
+	}
+
+	private JPanel getConfigButtonPanel() {
+		if (configButtonPanel == null) {
+			configButtonPanel = new JPanel();
+			configButtonPanel.setLayout(new BoxLayout(configButtonPanel, BoxLayout.Y_AXIS));
+			configButtonPanel.add(getAddDatabaseButton());
+			configButtonPanel.add(getEditDatabaseButton());
+			configButtonPanel.add(getRemoveDatabaseButton());
+			configButtonPanel.add(getExportDatabaseButton());
+			configButtonPanel.add(getImportDatabaseButton());
+		}
+		return configButtonPanel;
+	}
+
+	private JButton getAddDatabaseButton() {
+		if (addDatabaseButton == null) {
+			addDatabaseButton = new JButton("Add");
+		}
+		return addDatabaseButton;
+	}
+
+	private JButton getEditDatabaseButton() {
+		if (editDatabaseButton == null) {
+			editDatabaseButton = new JButton("Edit");
+		}
+		return editDatabaseButton;
+	}
+
+	private JButton getRemoveDatabaseButton() {
+		if (removeDatabaseButton == null) {
+			removeDatabaseButton = new JButton("Remove");
+		}
+		return removeDatabaseButton;
+	}
+
+	private JButton getExportDatabaseButton() {
+		if (exportDatabaseButton == null) {
+			exportDatabaseButton = new JButton("Export");
+		}
+		return exportDatabaseButton;
+	}
+
+	private JButton getImportDatabaseButton() {
+		if (importDatabaseButton == null) {
+			importDatabaseButton = new JButton("Import");
+		}
+		return importDatabaseButton;
+	}
+
+	private JPanel getQueryEditorPanel() {
+		if (queryEditorPanel == null) {
+			queryEditorPanel = new JPanel();
+			queryEditorPanel.setLayout(new BorderLayout());
+			queryEditorPanel.add(getQueryEditorScrollPane(), BorderLayout.CENTER);
+			queryEditorPanel.add(getQueryButtonPanel(), BorderLayout.SOUTH);
+		}
+		return queryEditorPanel;
+	}
+	private JScrollPane getQueryEditorScrollPane() {
+		if (queryEditorScrollPane == null) {
+			queryEditorScrollPane = new JScrollPane(getQueryTextPane());
+		}
+		return queryEditorScrollPane;
+	}
+
 	private JTextPane getQueryTextPane() {
 		if (queryTextPane == null) {
-		    StyleContext sc = new StyleContext();
+		    final StyleContext sc = new StyleContext();
 		    final DefaultStyledDocument doc = new DefaultStyledDocument(sc);
 		    queryTextPane = new JTextPane(doc);
 
-		    final Style mainStyle = sc.addStyle("Main Style", null);
+		    final Style mainStyle = sc.addStyle("MainStyle", null);
 		    mainStyle.addAttribute(StyleConstants.FontSize, new Integer(16));
 		    mainStyle.addAttribute(StyleConstants.FontFamily, "consolas");
 
 		    doc.setLogicalStyle(0, mainStyle);
 		}
 		return queryTextPane;
+	}
+
+	private JPanel getQueryButtonPanel() {
+		if (queryButtonPanel == null) {
+			queryButtonPanel = new JPanel();
+			queryButtonPanel.add(getImportQueriesButton());
+			queryButtonPanel.add(getExportQueriesButton());
+			queryButtonPanel.add(getSaveQueriesButton());
+		}
+		return queryButtonPanel;
+	}
+
+	private JButton getExportQueriesButton() {
+		if (exportQueriesButton == null) {
+			exportQueriesButton = new JButton("Export");
+		}
+		return exportQueriesButton;
+	}
+
+	private JButton getImportQueriesButton() {
+		if (importQueriesButton == null) {
+			importQueriesButton = new JButton("Import");
+		}
+		return importQueriesButton;
+	}
+
+	private JButton getSaveQueriesButton() {
+		if (saveQueriesButton == null) {
+			saveQueriesButton = new JButton("Save");
+		}
+		return saveQueriesButton;
 	}
 
 	private JMenuBar getConfigMenuBar() {
