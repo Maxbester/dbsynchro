@@ -19,14 +19,14 @@ import javax.mail.internet.MimeMessage;
 public class Email {
 
 	private final String from;
-	private final Smtp smtp;
+	private final SmtpConfig smtpConfig;
 	private final String subject;
 	private Set<String> recipients;
 
 	public Email(String from, Set<String> recipients, String smtp, String port, String subject) {
 		this.from = from;
 		this.recipients = recipients;
-		this.smtp = new Smtp(smtp, port);
+		this.smtpConfig = new SmtpConfig(smtp, port);
 		this.subject = subject;
 	}
 
@@ -34,12 +34,12 @@ public class Email {
 		return from;
 	}
 
-	public String getSmtp() {
-		return smtp.getAddress();
+	public String getSmtpAddress() {
+		return smtpConfig.getAddress();
 	}
 
 	public String getPort() {
-		return smtp.getPort();
+		return smtpConfig.getPort();
 	}
 
 	public String getSubject() {
@@ -62,7 +62,7 @@ public class Email {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("(");
-		sb.append(smtp);
+		sb.append(smtpConfig);
 		sb.append(") - from ");
 		sb.append(from);
 		sb.append(" to ");
@@ -84,10 +84,10 @@ public class Email {
 	public void send(String content) throws MessagingException {
 		//Set the host smtp address
 	     Properties props = new Properties();
-	     props.put("mail.smtp.host", smtp.getAddress());
-	     props.put("mail.protocol.port", smtp.getPort());
+	     props.put("mail.smtp.host", smtpConfig.getAddress());
+	     props.put("mail.protocol.port", smtpConfig.getPort());
 
-	     boolean auth = smtp.hasAuth();
+	     boolean auth = smtpConfig.hasAuth();
 	     if (auth) {
 	    	 props.put("mail.smtp.auth", "true");
 	     }
@@ -117,7 +117,7 @@ public class Email {
 
 	     Transport tr = session.getTransport("smtp");
 	     if (auth) {
-	    	 tr.connect(smtp.getAddress(), smtp.getLogin(), smtp.getPassword());
+	    	 tr.connect(smtpConfig.getAddress(), smtpConfig.getLogin(), smtpConfig.getPassword());
 	     }
 	     tr.sendMessage(message,message.getAllRecipients());
 

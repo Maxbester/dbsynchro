@@ -3,12 +3,27 @@ package org.dbsynctool;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Query {
-	
-	private Database source;
-	private Map<Integer, Database> targets;
+import javax.sql.rowset.CachedRowSet;
 
+public class Query {
+
+	/**
+	 * Source database.
+	 */
+	private Database sourceDb;
+	/**
+	 * Source statement to run.
+	 */
 	private String sourceStatement;
+	/**
+	 * Results of the sourceDb statement. This object will be set running feedSourceQuery from SqlRunner.
+	 */
+	private CachedRowSet sourceRowSet;
+
+	/**
+	 * Target databases. The key is used to linked them with their statements.
+	 */
+	private Map<Integer, Database> targets;
 	private Map<Integer, String> targetStatements;
 
 	public Query() {
@@ -17,10 +32,10 @@ public class Query {
 	}
 
 	/**
-	 * @return the source
+	 * @return the sourceDb
 	 */
 	public Database getSourceDatabase() {
-		return source;
+		return sourceDb;
 	}
 
 	/**
@@ -45,10 +60,10 @@ public class Query {
 	}
 
 	/**
-	 * @param source the source to set
+	 * @param sourceDb the sourceDb to set
 	 */
 	public void setSource(Database source) {
-		this.source = source;
+		this.sourceDb = source;
 	}
 
 	/**
@@ -57,6 +72,14 @@ public class Query {
 	public void addTarget(Integer key, Database db, String statement) {
 		targets.put(key, db);
 		targetStatements.put(key, statement);
+	}
+
+	/**
+	 * Remove a target statement using its key.
+	 * @param key
+	 */
+	public void removeTarget(Integer key) {
+		targetStatements.remove(key);
 	}
 
 	/**
@@ -73,11 +96,23 @@ public class Query {
 		return targets;
 	}
 
+	public CachedRowSet getSourceSetRow() {
+		return sourceRowSet;
+	}
+
+	/**
+	 * Set the sourceDb database set of rows. 
+	 * @param sourceRowSet
+	 */
+	public void setSourceSetRow(CachedRowSet sourceRowSet) {
+		this.sourceRowSet = sourceRowSet;
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("QUERY FROM ");
-		sb.append(source);
+		sb.append(sourceDb);
 		sb.append(" (");
 		sb.append(sourceStatement);
 		sb.append(") TO\n");

@@ -1,7 +1,7 @@
 package org.dbsynctool;
 
 
-public class Smtp {
+public class SmtpConfig {
 
 	private String address;
 	private String port;
@@ -12,7 +12,7 @@ public class Smtp {
 	 * @param address
 	 * @param port
 	 */
-	public Smtp(String address, String port) {
+	public SmtpConfig(String address, String port) {
 		super();
 		this.address = address;
 		this.port = port;
@@ -24,7 +24,7 @@ public class Smtp {
 	 * @param login
 	 * @param password
 	 */
-	public Smtp(String address, String port, String login, String password) {
+	public SmtpConfig(String address, String port, String login, String password) {
 		super();
 		this.address = address;
 		this.port = port;

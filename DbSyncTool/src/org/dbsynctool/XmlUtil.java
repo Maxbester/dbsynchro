@@ -96,8 +96,8 @@ public class XmlUtil {
 		xstream.alias("database", Database.class);
 		// map the email tag with the Email class
 		xstream.alias("email", Email.class);
-		// map the smtp tag with Smtp class
-		xstream.alias("smtp", Smtp.class);
+		// map the smtp tag with SmtpConfig class
+		xstream.alias("smtp", SmtpConfig.class);
 
 		// define that the databases are stored in an implicit collection
 		xstream.addImplicitCollection(Config.class, "databases", "database", Database.class);
@@ -149,8 +149,8 @@ public class XmlUtil {
 		xstream.alias("database", Database.class);
 		// map the email tag with the Email class
 		xstream.alias("email", Email.class);
-		// map the smtp tag with Smtp class
-		xstream.alias("smtp", Smtp.class);
+		// map the smtp tag with SmtpConfig class
+		xstream.alias("smtp", SmtpConfig.class);
 
 		// define that the databases are stored in an implicit collection
 		xstream.addImplicitCollection(Config.class, "databases", "database", Database.class);
