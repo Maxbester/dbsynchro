@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="validation.xsd">
+  <email>
+    <smtpConfig>
+      <address>localhost</address>
+      <port>25</port>
+      <login>login</login>
+      <password>password</password>
+    </smtpConfig>
+    <from>from</from>
+    <subject>Synchronisation failed</subject>
+    <recipient>recipient</recipient>
+  </email>
+  <database>
+    <name>name</name>
+    <url>localhost</url>
+    <login>login</login>
+    <password>password</password>
+    <driver>com.mysql.jdbc.Driver</driver>
+  </database>
+  <database>
+    <name>name</name>
+    <url>localhost</url>
+    <login>login</login>
+    <password>password</password>
+    <driver>com.mysql.jdbc.Driver</driver>
+  </database>
+</config>

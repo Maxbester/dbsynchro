@@ -5,6 +5,8 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
+import javax.sql.rowset.CachedRowSet;
+
 import org.apache.log4j.Logger;
 
 /**
@@ -15,7 +17,7 @@ import org.apache.log4j.Logger;
  *
  */
 public class SqlRunner {
-	
+
 	private static final Logger log = Logger.getLogger(SqlRunner.class.getName());
 	private String emailContent;
 	private List<Query> queries;
@@ -28,18 +30,27 @@ public class SqlRunner {
 		this.queries = queries;
 	}
 
+	/**
+	 * Run all distant and source queries.
+	 */
 	public void runQueries() {
 		log.info("Running SQL statements");
+
+		if (queries == null) {
+			log.error("Cannot run the queries because the list of queries is null.");
+			return;
+		}
 
 		log.info("Number of source queries: "+queries.size());
 
 		int changedRows = 0;
 
+		feedAllSourceQueries();
+
 		for (Query q : queries) {
-			Database sourceDb = q.getSourceDatabase();
+			CachedRowSet sourceRS = null;
 			try {
-				sourceDb.connect();
-				ResultSet sourceRS = sourceDb.selectStatement(q.getSourceStatement());
+				sourceRS = q.getSourceSetRow();
 
 				for (Map.Entry<Integer, Database> target : q.getTargets().entrySet()) {
 					Database targetDb = target.getValue();
@@ -52,17 +63,71 @@ public class SqlRunner {
 					}
 					targetDb.disconnect();
 				}
-				sourceRS.close();
-				sourceDb.disconnect();
 			} catch (SQLException e) {
 				log.error("Cannot connect to the database: "+e.getMessage());
-			}			
+			} finally {
+				try {
+					sourceRS.close();
+				} catch (SQLException e) {
+					log.debug("Cannot close the ResultSet",e);
+				}
+			}
 		}
 		log.info("Affected rows: "+changedRows);
 		log.info("SQL statements finished\n");
 	}
 
-	private int runDistantQuery(String targetStatement, ResultSet sourceRs, Database targetDb) {
+	/**
+	 * Run the select source statements and store them into the query list. This way, it will be easier to run the queries later.
+	 */
+	public void feedAllSourceQueries() {
+		// cannot run query if the list is null
+		if (queries == null) {
+			return;
+		}
+
+		// select each query from the list
+		for (Query q : queries) {
+			Database sourceDb = q.getSourceDatabase();
+			CachedRowSet sourceRS = null;
+			try {
+				// connect
+				sourceDb.connect();
+				sourceRS = sourceDb.selectStatement(q.getSourceStatement());
+				q.setSourceSetRow(sourceRS);
+			} catch (SQLException e) {
+				log.error("Cannot connect to the database: "+e.getMessage());
+			} finally {
+				sourceDb.disconnect();
+			}
+		}
+	}
+
+	/**
+	 * Run only the source statement in parameter.
+	 * @param q
+	 */
+	public void feedSourceQuery(Query q) {
+		// cannot run query if the list is null
+		if (q == null) {
+			return;
+		}
+
+		Database sourceDb = q.getSourceDatabase();
+		CachedRowSet sourceRS = null;
+		try {
+			// connect
+			sourceDb.connect();
+			sourceRS = sourceDb.selectStatement(q.getSourceStatement());
+			q.setSourceSetRow(sourceRS);
+		} catch (SQLException e) {
+			log.error("Cannot connect to the database: "+e.getMessage());
+		} finally {
+			sourceDb.disconnect();
+		}
+	}
+
+	public int runDistantQuery(String targetStatement, ResultSet sourceRs, Database targetDb) {
 		if (sourceRs == null || targetStatement == null || targetDb == null) {
 			log.warn("Distant query or source statement null.");
 			return 0;
@@ -114,7 +179,7 @@ public class SqlRunner {
 	public void removeQuery(Query query) {
 		queries.remove(query);
 	}
-	
+
 	public String getEmailContent() {
 		return emailContent;
 	}

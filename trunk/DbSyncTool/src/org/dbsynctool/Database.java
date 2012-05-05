@@ -7,7 +7,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import javax.sql.rowset.CachedRowSet;
+
 import org.apache.log4j.Logger;
+
+import com.sun.rowset.CachedRowSetImpl;
 
 
 public class Database {
@@ -112,7 +116,8 @@ public class Database {
      * @return
      * @throws SQLException 
      */
-    public ResultSet selectStatement(String statement) throws SQLException {
+    public CachedRowSet selectStatement(String statement) throws SQLException {
+    	CachedRowSet crs = new CachedRowSetImpl();
     	ResultSet rs = null;
     	if (isConnected() && statement != null && (statement.startsWith("SELECT") || statement.startsWith("select"))) {
 	    	Statement stat = connect().createStatement();
@@ -120,8 +125,12 @@ public class Database {
 	        if (log.isInfoEnabled()) {
 	        	log.info(name+" -> "+statement);
 	        }
+	        // prevent from being updated
+	        crs.setConcurrency(ResultSet.CONCUR_READ_ONLY);
+	        crs.populate(rs);
+	        rs.close();
     	}
-        return rs;
+        return crs;
     }
 
 	/**
